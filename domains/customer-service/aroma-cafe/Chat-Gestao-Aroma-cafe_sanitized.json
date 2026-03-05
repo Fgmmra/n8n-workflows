@@ -1,0 +1,1317 @@
+{
+  "name": "Chat-Gestao-Aroma-café",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "4e2f658e-296c-47fe-823f-702cdae19b8b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "array"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eec930bc-6d03-4772-9c68-5447650ccfef",
+                    "leftValue": "={{ $json.message }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1504,
+        192
+      ],
+      "id": "0ea20025-5f72-4608-b18c-b9cd237ef3f5",
+      "name": "switch"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "{{WEBHOOK_PATH}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -752,
+        224
+      ],
+      "id": "5e2f5a7d-f150-48b3-a2bb-6d232646e41d",
+      "name": "Webhook",
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=aroma-cafe-{{ $('variaveisWebhook').item.json.Telefone }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        1840,
+        400
+      ],
+      "id": "e0dcd1eb-f0c0-4977-b36f-8fe60da1d7c3",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Redis Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('unificaMessage').item.json.unificaMessage }}",
+        "options": {
+          "systemMessage": "=Você é um assistente profissional responsável por consultar e atualizar uma planilha de produtos através de ferramentas.\n\nA planilha contém as colunas:\nProduto, Marca, Preço, Quantidade\n\nVocê possui duas ferramentas:\n\nFerramenta 1: Consultar estoque\nUse esta ferramenta sempre que precisar ler dados da planilha, verificar produtos, preços, marcas ou quantidades.\n\nFerramenta 2: Alterar estoque\nUse esta ferramenta sempre que o usuário solicitar adicionar, editar, remover ou corrigir qualquer informação da planilha.\n\nRegras obrigatórias de comportamento:\n\nResponda sempre em português.\nSeja direto e objetivo.\nNão utilize emojis.\nNão utilize formatação especial.\nNunca invente dados. Utilize apenas informações da planilha.\n\nRegras para CONSULTA:\n\nSe o usuário fizer perguntas como:\nQual o preço do café?\nTem arroz em estoque?\nListe os produtos\nQual a quantidade do feijão?\n\nVocê deve chamar a ferramenta Consultar estoque para obter os dados antes de responder.\n\nRegras para ATUALIZAÇÃO:\n\nSe o usuário solicitar:\nAtualizar preço\nAlterar quantidade\nCorrigir marca\nRenomear produto\nAdicionar produto\nRemover produto\n\nE o pedido estiver claro e completo, você deve chamar imediatamente a ferramenta Alterar estoque.\n\nNunca peça confirmação se:\no produto estiver identificado\no campo estiver claro\no novo valor estiver informado\n\nApós executar a atualização, confirme de forma objetiva o que foi feito.\n\nExemplo de confirmação:\nO preço do produto Feijão 1kg foi atualizado para R$ 10,20.\n\nRegras para pedir esclarecimento:\n\nSó peça mais informações se:\no produto não existir\nexistirem produtos ambíguos\no campo não estiver claro\no novo valor não for informado\n\nFora desses casos, execute a ação diretamente."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        208
+      ],
+      "id": "0c96d6ab-e5a9-45a9-a324-681e3faf926f",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        400
+      ],
+      "id": "d1234f3e-d455-4f31-81aa-1e391bc73542",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "271680c0-1cb0-4f30-b0e6-7428db11871f",
+              "leftValue": "={{ $json.Telefone }}",
+              "rightValue": "{{ALLOWED_PHONE_1}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "d8bdc669-33f8-4e27-841e-a266cbe8d7f6",
+              "leftValue": "={{ $json.Telefone }}",
+              "rightValue": "{{ALLOWED_PHONE_2}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "110c7fc5-2038-4117-a294-903d070b8243",
+              "leftValue": "={{ $json.Telefone }}",
+              "rightValue": "{{ALLOWED_PHONE_3}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -144,
+        240
+      ],
+      "id": "8314a703-aca4-4fbc-9310-f93cb5398b62",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8eca2a86-7a67-47d3-9c77-cc3f0b93461d",
+              "leftValue": "={{ $('Webhook').item.json.body.chat.wa_isGroup }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -368,
+        224
+      ],
+      "id": "f236ee9f-d237-4793-bc98-b0eae3589c5a",
+      "name": "Verifica grupo"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "{{GOOGLE_SHEETS_ID}}",
+          "mode": "list",
+          "cachedResultName": "Gestão-Aroma-Café",
+          "cachedResultUrl": "{{GOOGLE_SHEETS_URL}}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "{{GOOGLE_SHEETS_URL}}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        2112,
+        400
+      ],
+      "id": "e47a66c3-4417-48d1-ba65-c3569010bea9",
+      "name": "Consultar estoque",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Sheets Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "{{AROMA_CAFÉ_TEXT_WORKFLOW_ID}}",
+          "mode": "list",
+          "cachedResultUrl": "{{SUBFLOW_WORKFLOW_URL}}",
+          "cachedResultName": "Aroma-Café-text"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phoneNumber": "={{ $('variaveisWebhook').item.json.Telefone }}",
+            "message": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "phoneNumber",
+              "displayName": "phoneNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2256,
+        208
+      ],
+      "id": "06b288ab-a822-4c05-b6cb-54302dc4c483",
+      "name": "Call \"Aroma-café-text\""
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "101c3ff7-e997-43bb-8e99-fe82746c5993",
+                    "leftValue": "={{ $('variaveisWebhook').item.json.type }}",
+                    "rightValue": "AudioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "38226af4-80fe-4155-9ceb-2379f44e29ed",
+                    "leftValue": "={{ $('variaveisWebhook').item.json.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "1a4aae82-9d4c-4baa-8c14-14993bb2e88f",
+                    "leftValue": "={{ $('variaveisWebhook').item.json.type }}",
+                    "rightValue": "=image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "0c944306-9325-44f8-a9d2-8a8306373936",
+                    "leftValue": "={{ $('variaveisWebhook').item.json.type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "43ff1b2c-1ad5-4231-89cd-e09b07a9d3be",
+                    "leftValue": "={{ $('variaveisWebhook').item.json.type }}",
+                    "rightValue": "file",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2813f23-ea18-4a7a-9ee7-ecf7ac3f6537",
+      "name": "verificaTipoMensagem",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        192,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "={{$('variaveisWebhook').item.json.geminiPrompt2}}",
+        "audioUrls": "={{ $json.fileURL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        656,
+        48
+      ],
+      "id": "e26f70b2-866d-45d3-9bf0-7c292fae08a5",
+      "name": "Analyze audio1",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('variaveisWebhook').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        480,
+        48
+      ],
+      "id": "06752b90-d39a-4258-9dd0-0f401165f029",
+      "name": "Download media file",
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Felipe"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "imageUrls": "={{ $json.fileURL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        656,
+        288
+      ],
+      "id": "3d7c6d77-dfd3-407a-b663-a11bd96c793c",
+      "name": "Analyze image",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "gemmi test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "documentUrls": "={{ $json.fileURL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        656,
+        608
+      ],
+      "id": "46a85a88-c392-4f18-91e3-5b0ed60e913b",
+      "name": "Analyze document",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "gemmi test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "videoUrls": "={{ $json.fileURL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        656,
+        448
+      ],
+      "id": "b7ce20cf-7e18-4749-8202-9205ab147419",
+      "name": "Analyze video",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "gemmi test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('variaveisWebhook').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        480,
+        608
+      ],
+      "id": "6953b3ea-6ca4-43fb-b79d-e57ebee9fe16",
+      "name": "Download media file1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Felipe"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('variaveisWebhook').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        480,
+        448
+      ],
+      "id": "afe1db0e-a837-43c8-b037-a23149ff0f4e",
+      "name": "Download media file2",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Felipe"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('variaveisWebhook').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        480,
+        288
+      ],
+      "id": "3f810ec1-f36b-4edd-a893-a06b815063fd",
+      "name": "Download media file3",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Felipe"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "17694db0-6248-444f-afb9-ff7ed13996ef",
+              "name": "message",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fd4c496b-04a2-4932-afa7-bc16ccbd6636",
+      "name": "audioTranscrito",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        912,
+        32
+      ],
+      "notesInFlow": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6d219c2-6a5a-4189-ae38-915e61af2293",
+              "name": "message",
+              "value": "={{ $('variaveisWebhook').item.json.userMessage}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        192
+      ],
+      "id": "cac644ef-5b9a-47f4-b54e-0ec707b54c7a",
+      "name": "messageText",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "844268f9-a6ce-4824-a1e4-b6aa652c6374",
+              "name": "unificaMessage",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        192
+      ],
+      "id": "21037282-10af-4a4e-83b8-ecd2ca54c59e",
+      "name": "unificaMessage"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6d219c2-6a5a-4189-ae38-915e61af2293",
+              "name": "message",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        384
+      ],
+      "id": "32194311-9476-486b-811a-2e748cbf0c01",
+      "name": "messageGemini",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ad0386d-8645-4292-8d08-410e6665a85b",
+              "name": "Telefone",
+              "value": "={{\n  $json.body.chat.phone\n    ?.replace(/\\D/g, '')\n    || null\n}}",
+              "type": "string"
+            },
+            {
+              "id": "365d3dda-15a9-4189-8050-816fdaf514fc",
+              "name": "type",
+              "value": "={{ $json.body.message.type }}",
+              "type": "string"
+            },
+            {
+              "id": "7fb2d85d-7eed-4151-99e3-b21fa9bb9bc1",
+              "name": "url",
+              "value": "={{ $json.webhookUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "e811271d-6033-4b4a-ba5f-abf606fb9d12",
+              "name": "userMessage",
+              "value": "={{ $json.body.message.content.text }}",
+              "type": "string"
+            },
+            {
+              "id": "372db1d9-ee41-4086-a68a-04c3d30750a3",
+              "name": "assistantId",
+              "value": "{{ASSISTANT_ID}}",
+              "type": "string"
+            },
+            {
+              "id": "962af416-e7a4-4f01-85fa-fe0074cd47c2",
+              "name": "geminiPrompt1",
+              "value": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+              "type": "string"
+            },
+            {
+              "id": "0cc65036-733e-40e9-89db-c71c5fcb8048",
+              "name": "geminiPrompt2",
+              "value": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<prompt_transcricao_audio>\n    <instrucao_principal>\n        <descricao>\n            Transcreva o audio na exata lingua que ele está, não altere o idioma de forma alguma.\n        </descricao>\n    </instrucao_principal>\n\n    <regras_transcricao>\n        <regra_idioma>\n            <titulo>Preservação do idioma original</titulo>\n            <detalhes>\n                O áudio deve ser transcrito mantendo exatamente o idioma em que foi gravado, sem qualquer tipo de tradução ou alteração linguística.\n            </detalhes>\n        </regra_idioma>\n\n        <regra_fidelidade>\n            <titulo>Fidelidade ao conteúdo</titulo>\n            <detalhes>\n                A transcrição deve ser uma reprodução fiel do que foi falado, preservando palavras, expressões e estruturas gramaticais originais.\n            </detalhes>\n        </regra_fidelidade>\n\n        <regra_integridade>\n            <titulo>Não alteração</titulo>\n            <detalhes>\n                Não realizar correções, adaptações ou modificações no texto transcrito, mantendo a forma original da fala.\n            </detalhes>\n        </regra_integridade>\n    </regras_transcricao>\n\n    <processo_execucao>\n        <etapa_1>Escutar o áudio completo</etapa_1>\n        <etapa_2>Identificar o idioma falado</etapa_2>\n        <etapa_3>Transcrever palavra por palavra no idioma original</etapa_3>\n        <etapa_4>Revisar a transcrição para garantir fidelidade</etapa_4>\n    </processo_execucao>\n\n    <observacoes>\n        <nota>\n            Caso o áudio contenha múltiplos idiomas, cada segmento deve ser transcrito no idioma correspondente em que foi falado.\n        </nota>\n    </observacoes>\n</prompt_transcricao_audio>",
+              "type": "string"
+            },
+            {
+              "id": "71972542-72ed-420c-ad49-5dbaded6464f",
+              "name": "aiAgentPrompt",
+              "value": "Coloque aqui seu prompt",
+              "type": "string"
+            },
+            {
+              "id": "0d0b3b69-418a-40ef-bd3a-6a4430d817c1",
+              "name": "mimeType",
+              "value": "={{ $json.body.message.content.mimetype }}",
+              "type": "string"
+            },
+            {
+              "id": "79724698-f7fb-4c7a-bf2a-12c0bccb9543",
+              "name": "messageId",
+              "value": "={{ $json.body.message.messageid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        224
+      ],
+      "id": "7dbdfb55-aca2-4e09-90bc-bebbf78b4a70",
+      "name": "variaveisWebhook"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "{{AROMA_CAFÉ_BUFFER_WORKFLOW_ID}}",
+          "mode": "list",
+          "cachedResultUrl": "{{SUBFLOW_WORKFLOW_URL}}",
+          "cachedResultName": "Aroma-Café-buffer"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $json.unificaMessage }}",
+            "phoneNumber": "={{ $('variaveisWebhook').item.json.Telefone }}",
+            "delayTimeMs": "140000"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "phoneNumber",
+              "displayName": "phoneNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "delayTimeMs",
+              "displayName": "delayTimeMs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        192
+      ],
+      "id": "addf6a07-6500-469e-8342-20ec1623f80a",
+      "name": "Call 'Aroma-Café-buffer'"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "{{GOOGLE_SHEETS_ID}}",
+          "mode": "list",
+          "cachedResultName": "Gestão-Aroma-Café",
+          "cachedResultUrl": "{{GOOGLE_SHEETS_URL}}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "{{GOOGLE_SHEETS_URL}}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Produto",
+              "displayName": "Produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Marca",
+              "displayName": "Marca",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Preço (R$)",
+              "displayName": "Preço (R$)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantidade",
+              "displayName": "Quantidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1968,
+        432
+      ],
+      "id": "d70b2d45-b907-4186-b534-7ebe73b9504f",
+      "name": "Alterar estoque1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Sheets Darkay"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "variaveisWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Call \"Aroma-café-text\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "verificaTipoMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Verifica grupo": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar estoque": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verificaTipoMensagem": {
+      "main": [
+        [
+          {
+            "node": "Download media file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "messageText",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media file3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media file2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media file": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media file1": {
+      "main": [
+        [
+          {
+            "node": "Analyze document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media file2": {
+      "main": [
+        [
+          {
+            "node": "Analyze video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media file3": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio1": {
+      "main": [
+        [
+          {
+            "node": "audioTranscrito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze video": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "audioTranscrito": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "messageText": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "messageGemini": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unificaMessage": {
+      "main": [
+        [
+          {
+            "node": "Call 'Aroma-Café-buffer'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "variaveisWebhook": {
+      "main": [
+        [
+          {
+            "node": "Verifica grupo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Aroma-Café-buffer'": {
+      "main": [
+        [
+          {
+            "node": "switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alterar estoque1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "cae8b0f9-7f39-4d9c-b1cb-a0c04643445b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "{{WORKFLOW_ID}}",
+  "tags": []
+}
