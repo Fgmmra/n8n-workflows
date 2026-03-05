@@ -1,0 +1,199 @@
+{
+  "name": "CFO Digital - Envio de audio",
+  "nodes": [
+    {
+      "parameters": {
+        "amount": 1.5
+      },
+      "id": "8e2ff2cb-0cf5-4d8e-99c9-9625e23e8404",
+      "name": "waitSeconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        0
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "caf21ddf-923c-4e86-bba7-618bcbd96ca8",
+      "name": "contentLoop",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        640,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "5ad1e37e-3cd6-4fc3-8eba-f3614a4e8188",
+      "name": "contentSplit",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "928f8c88-2bb4-40c3-8bd1-890d248b9365",
+              "name": "message",
+              "value": "={{ $json.message.split('\\n\\n').map(item => item.replace(/\\[|\\]/g, '')) }}",
+              "type": "array"
+            },
+            {
+              "id": "3196df60-b877-49a2-ab00-7437138cca28",
+              "name": "recipient",
+              "value": "={{ $json.phoneNumber }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        -64
+      ],
+      "id": "b129be21-6d32-4512-9608-bfa3980c38a2",
+      "name": "variaveisAmbiente"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "phoneNumber"
+            },
+            {
+              "name": "message"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        -64
+      ],
+      "id": "3585d059-b041-4979-a699-cff5f02992ce",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.recipient }}",
+        "text": "={{ $json.message.replace(/\\[NIN]/g, '').split('\\n\\n').join('\\n') }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        896,
+        0
+      ],
+      "id": "372a8e5c-0134-4d43-a1f6-b5726cd501aa",
+      "name": "Send text message",
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Fugimura account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "waitSeconds": {
+      "main": [
+        [
+          {
+            "node": "contentLoop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contentLoop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contentSplit": {
+      "main": [
+        [
+          {
+            "node": "contentLoop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "variaveisAmbiente": {
+      "main": [
+        [
+          {
+            "node": "contentSplit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "variaveisAmbiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send text message": {
+      "main": [
+        [
+          {
+            "node": "waitSeconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "f1fc915f-ac93-48b6-aa83-ff4f87519c0b",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "{{WORKFLOW_ID}}",
+  "tags": []
+}
