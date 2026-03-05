@@ -1,0 +1,1340 @@
+{
+  "name": "CFO Digital - Agente conversacional",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "101c3ff7-e997-43bb-8e99-fe82746c5993",
+                    "leftValue": "={{ $('variaveis').item.json.messageType }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "38226af4-80fe-4155-9ceb-2379f44e29ed",
+                    "leftValue": "={{ $('variaveis').item.json.messageType }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "1a4aae82-9d4c-4baa-8c14-14993bb2e88f",
+                    "leftValue": "={{ $('variaveis').item.json.messageType }}",
+                    "rightValue": "=image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "0c944306-9325-44f8-a9d2-8a8306373936",
+                    "leftValue": "={{ $('variaveis').item.json.messageType }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "43ff1b2c-1ad5-4231-89cd-e09b07a9d3be",
+                    "leftValue": "={{ $('variaveis').item.json.messageType }}",
+                    "rightValue": "file",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1baaed47-5ff8-4d2a-bfdd-de3e6e28f693",
+      "name": "verificaTipoMensagem",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        192,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "17694db0-6248-444f-afb9-ff7ed13996ef",
+              "name": "message",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3154e82c-1e15-4439-b160-141bcabbe733",
+      "name": "audioTranscrito",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        992,
+        -48
+      ],
+      "notesInFlow": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "4e2f658e-296c-47fe-823f-702cdae19b8b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "array"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eec930bc-6d03-4772-9c68-5447650ccfef",
+                    "leftValue": "={{ $json.message }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1520,
+        112
+      ],
+      "id": "c600d969-8e45-4f22-9898-9c83fdbff9be",
+      "name": "switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6d219c2-6a5a-4189-ae38-915e61af2293",
+              "name": "message",
+              "value": "={{ $('variaveis').item.json.userMessage}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        112
+      ],
+      "id": "df98653c-d96f-4235-bea5-b532fcffc9a3",
+      "name": "messageText"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "844268f9-a6ce-4824-a1e4-b6aa652c6374",
+              "name": "unificaMessage",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        112
+      ],
+      "id": "d69ce960-f4e8-4718-9f5f-d08008ad2e49",
+      "name": "unificaMessage"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6d219c2-6a5a-4189-ae38-915e61af2293",
+              "name": "message",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        272
+      ],
+      "id": "5807b2c8-7f2e-4b05-9e73-5004e917d706",
+      "name": "messageGemini"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "imageUrls": "={{ $json.fileURL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        688,
+        384
+      ],
+      "id": "4a04f0af-e1c8-4ac6-b507-4736e824c710",
+      "name": "Analyze image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "documentUrls": "={{ $json.fileURL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        688,
+        704
+      ],
+      "id": "dee78ca2-c426-4a9c-b881-f10ff7192ed5",
+      "name": "Analyze document",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "videoUrls": "={{ $json.fileURL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        688,
+        544
+      ],
+      "id": "cf4dba33-ca1f-4542-8f54-409c9e1f7f4a",
+      "name": "Analyze video",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<prompt_transcricao_audio>\n    <instrucao_principal>\n        <descricao>\n            Transcreva o audio na exata lingua que ele está, não altere o idioma de forma alguma.\n        </descricao>\n    </instrucao_principal>\n\n    <regras_transcricao>\n        <regra_idioma>\n            <titulo>Preservação do idioma original</titulo>\n            <detalhes>\n                O áudio deve ser transcrito mantendo exatamente o idioma em que foi gravado, sem qualquer tipo de tradução ou alteração linguística.\n            </detalhes>\n        </regra_idioma>\n\n        <regra_fidelidade>\n            <titulo>Fidelidade ao conteúdo</titulo>\n            <detalhes>\n                A transcrição deve ser uma reprodução fiel do que foi falado, preservando palavras, expressões e estruturas gramaticais originais.\n            </detalhes>\n        </regra_fidelidade>\n\n        <regra_integridade>\n            <titulo>Não alteração</titulo>\n            <detalhes>\n                Não realizar correções, adaptações ou modificações no texto transcrito, mantendo a forma original da fala.\n            </detalhes>\n        </regra_integridade>\n    </regras_transcricao>\n\n    <processo_execucao>\n        <etapa_1>Escutar o áudio completo</etapa_1>\n        <etapa_2>Identificar o idioma falado</etapa_2>\n        <etapa_3>Transcrever palavra por palavra no idioma original</etapa_3>\n        <etapa_4>Revisar a transcrição para garantir fidelidade</etapa_4>\n    </processo_execucao>\n\n    <observacoes>\n        <nota>\n            Caso o áudio contenha múltiplos idiomas, cada segmento deve ser transcrito no idioma correspondente em que foi falado.\n        </nota>\n    </observacoes>\n</prompt_transcricao_audio>",
+        "audioUrls": "={{ $json.fileURL }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        688,
+        -48
+      ],
+      "id": "ea7e55a1-daf4-4928-b24b-02f542e84e77",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "{{WEBHOOK_PATH}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        96
+      ],
+      "id": "85494ae8-9e45-4f93-84f2-83198c418a8f",
+      "name": "Webhook",
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "{{CFO_DIGITAL___BUFFER_WORKFLOW_ID}}",
+          "mode": "list",
+          "cachedResultUrl": "{{SUBFLOW_WORKFLOW_URL}}",
+          "cachedResultName": "CFO Digital - buffer"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $json.unificaMessage }}",
+            "phoneNumber": "={{ $('variaveis').item.json.phoneNumber }}",
+            "delayTimeMs": "140000"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "phoneNumber",
+              "displayName": "phoneNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "delayTimeMs",
+              "displayName": "delayTimeMs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1328,
+        112
+      ],
+      "id": "b2b65345-ddc1-4394-bfe9-9c57c17c6710",
+      "name": "Execute Workflow2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "22c537ca-06e0-4a61-bcbc-6ef8034365d4",
+              "leftValue": "={{ $('variaveis').item.json.phoneNumber }}",
+              "rightValue": "{{ALLOWED_PHONE_1}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "4514b79a-b957-45b7-86fd-cf11045a7446",
+              "leftValue": "={{ $('variaveis').item.json.phoneNumber }}",
+              "rightValue": "{{ALLOWED_PHONE_2}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "15015e19-ff1d-4df9-9e3b-7a48e2d274e1",
+              "leftValue": "={{ $('variaveis').item.json.phoneNumber }}",
+              "rightValue": "{{ALLOWED_PHONE_3}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "6fd5cb7e-9be2-40f4-9f25-06f6d07eafb2",
+              "leftValue": "={{ $('variaveis').item.json.phoneNumber }}",
+              "rightValue": "{{ALLOWED_PHONE_4}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e393db9d-cda1-4fe2-96b6-4359bcb8a3c5",
+              "leftValue": "={{ $('variaveis').item.json.phoneNumber }}",
+              "rightValue": "{{ALLOWED_PHONE_5}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        160
+      ],
+      "id": "9c7ec496-024a-49bf-9175-d21678ecf429",
+      "name": "verificaContato"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "33dd4fc0-904b-4977-bb9e-0345297d4cca",
+              "leftValue": "={{ $json.userMessage }}",
+              "rightValue": "#sair",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        96
+      ],
+      "id": "3c8ab59a-f664-47c6-9cef-609a66830002",
+      "name": "#sair"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ad0386d-8645-4292-8d08-410e6665a85b",
+              "name": "phoneNumber",
+              "value": "={{\n  $json.body.chat.phone\n    ?.replace(/\\D/g, '')\n    || null\n}}",
+              "type": "string"
+            },
+            {
+              "id": "365d3dda-15a9-4189-8050-816fdaf514fc",
+              "name": "messageType",
+              "value": "={{ $('Webhook').item.json.body.message.type }}",
+              "type": "string"
+            },
+            {
+              "id": "7fb2d85d-7eed-4151-99e3-b21fa9bb9bc1",
+              "name": "messageId",
+              "value": "={{ $json.body.message.messageid }}",
+              "type": "string"
+            },
+            {
+              "id": "e811271d-6033-4b4a-ba5f-abf606fb9d12",
+              "name": "userMessage",
+              "value": "={{ $json.body.message.content.text }}{{ $json.body.message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        96
+      ],
+      "id": "caaf2797-7bb1-4358-9327-9edcceedd3f0",
+      "name": "variaveis"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=cfodigital:{{ $workflow.id }}:{{ $('variaveis').item.json.phoneNumber }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -96
+      ],
+      "id": "b8e14661-c5b3-492d-963f-d73ff397a397",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Redis Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=cfodigital:{{ $workflow.id }}:{{ $('variaveis').item.json.phoneNumber }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        1728,
+        400
+      ],
+      "id": "0b955c9b-721c-4164-93f6-45309488f6d1",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Redis Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "{{CFO_DIGITAL___ENVIO_DE_TEXTO_WORKFLOW_ID}}",
+          "mode": "list",
+          "cachedResultUrl": "{{SUBFLOW_WORKFLOW_URL}}",
+          "cachedResultName": "CFO digital - envio de texto"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phoneNumber": "={{ $('variaveis').item.json.phoneNumber }}",
+            "message": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "phoneNumber",
+              "displayName": "phoneNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2176,
+        128
+      ],
+      "id": "f29985b3-beaf-436f-8a9d-765f9050ed23",
+      "name": "Execute Workflow1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "=<GeneratedPrompt>\n<dateTime>{{ $now.format('FFFF') }}</dateTime>\n\n  <Context>\n    Você é um CFO Virtual atuando como agente interno de uma empresa.\n    Seu papel é consolidar dados financeiros brutos, organizá-los em Fluxo de Caixa e DRE,\n    gerar inteligência de negócio e atuar como consultor financeiro e contábil para o empresário.\n\n    Você opera em um ambiente privado com dados financeiros sensíveis provenientes de\n    Google Sheets ou ERP, respeitando confidencialidade, precisão matemática\n    e boas práticas contábeis.\n\n    O usuário é um empresário ou gestor, não necessariamente especialista em finanças,\n    que busca respostas claras, corretas e acionáveis para tomada de decisão. Sempre que tiver um primeiro contato com o usuário, se apresente brevemente e fale em como pode ajudar ele.\n  </Context>\n\n  <Outcome>\n    Entregar análises financeiras precisas e orientadas à decisão, incluindo:\n    - Confirmação de lucro ou prejuízo por período\n    - Explicação dos principais drivers financeiros\n    - Identificação dos maiores centros de custo\n    - Avaliação da saúde do fluxo de caixa\n    - Comparação de prazos de recebimento e pagamento\n    - Orientações contábeis baseadas em boas práticas\n\n    Sempre que possível, concluir com:\n    - Conclusão objetiva\n    - Riscos identificados\n    - Recomendações práticas\n  </Outcome>\n\n  <Scale>\n    Uso contínuo e recorrente.\n    Profundidade analítica e executiva, suficiente para decisões reais,\n    evitando tecnicismo excessivo.\n  </Scale>\n\n  <Time>\n    Respostas devem ser rápidas, claras e completas.\n    Priorizar objetividade.\n    Sempre sinalizar urgência quando houver impacto relevante no caixa,\n    margem ou sustentabilidade financeira.\n  </Time>\n\n  <Actor>\n    Você atua como um CFO experiente, estratégico, conservador com riscos\n    e orientado à sustentabilidade financeira do negócio.\n\n    Tom de voz: profissional, claro e confiante.\n    Postura: questiona decisões ruins, alerta riscos e propõe alternativas.\n  </Actor>\n\n  <Resources>\n    <AvailableData>\n      - Fluxo de Caixa com datas de competência e liquidação\n      - DRE contendo:\n        Receita Bruta,\n        Impostos,\n        Custos Variáveis,\n        Margem de Contribuição,\n        Custos Fixos,\n        Lucro Líquido\n      - Manual de Conduta Financeira (regras contábeis internas)\n    </AvailableData>\n\n    <Restrictions>\n      - Nunca estimar valores\n      - Nunca assumir números\n      - Sempre calcular antes de responder\n      - Não fornecer aconselhamento jurídico\n      - Sempre respeitar a separação entre pessoa física e jurídica\n    </Restrictions>\n  </Resources>\n\n  <Tools>\n    <Tool name=\"Call 'CFO Digital - Agente de calculos'\">\n      <MandatoryUsageRule>\n        Sempre que a pergunta do usuário envolver:\n        - valores financeiros\n        - resultados mensais\n        - fluxo de caixa\n        - DRE\n        - centros de custo\n        - prazos médios\n        - lucratividade\n\n        Você deve obrigatoriamente ativar a tool Call 'CFO Digital - Agente de calculos' antes de responder.\n      </MandatoryUsageRule>\n\n      <Responsibilities>\n        - Ler dados da planilha (Google Sheets ou ERP)\n        - Executar cálculos matemáticos exatos\n        - Retornar valores financeiros consolidados\n      </Responsibilities>\n\n      <Prohibition>\n        Nunca responder análises financeiras sem consultar previamente a tool Call 'CFO Digital - Agente de calculos'.\n      </Prohibition>\n    </Tool>\n\n<Tool name=\"Call 'CFO Digital - Envio de pdf'\">\n      <MandatoryUsageRule>\n        Após acionar a tool \"Call 'CFO Digital - Agente de calculos'\" você pode acionar essa ferramenta caso o usuário pedir para enviar o conteúdo todo para ele em um PDF.\n\n        Você deve obrigatoriamente enviar o conteúdo da tool Call 'CFO Digital - Agente de calculos' ao acionar essa tool para inserir os dados no PDF.\n      </MandatoryUsageRule>\n\n      <Responsibilities>\n        - Enviar o conteúdo da analise para a ferramenta\n        - Acionar a tool antes para garantir o envio da informação correta\n        - Não alterar nenhuma informação essencial da analise\n\t- Confirme com o usuário se ele quer o PDF ou que o conteúdo seja enviado no chat\n      </Responsibilities>\n\n      <Prohibition>\n        Nunca enviar dados alterados, errados ou não enviar nada na tool. Não a acione sem a consentimento do usuário.\n      </Prohibition>\n    </Tool>\n  </Tools>\n\n  <BehaviorRules>\n    <ProfitabilityAnalysis>\n      - Determinar lucro ou prejuízo por período\n      - Explicar causas operacionais e financeiras\n      - Diferenciar resultado recorrente de eventos pontuais\n    </ProfitabilityAnalysis>\n\n    <messageFormat>\n      - Ao enviar uma mensagem em negrito, envie sempre APENAS UMA UNIDADE DE ASPAS (*) por lado de mensagem. NÃO enviando DUAS UNIDADES DE ASPAS (**) por lado de mensagem. Segue o exemplo do envio correto: \"*exemplo123*\".\n      - Utilize UMA UNIDADE de travessão para listar cada item de um tópico. Segue o exemplo:\n- 123456789\n-umdoistresquatrocincoseisseteoitonove\n-blablablablabla\n\n      - Ao interagir com o usuário, tenha preferencia em blocos com no máximo de 2 a 4 linhas de texto normalmente. Todavia, em casos de apresentação, explicações, é ecomendavél que agrupe as mensagens em um só bloco de texto devidamente formatado e organizado.\n      - Evite ser muito \"Verboso\" logo no inicio. Foque em passar os nomes, titulos ou nomeclaturas, sem explicação em formato de lista. Caso o usuário perguntar sobre, descreva brevemente, evitando mui descrição e mantendo a objetividade.\n      - É preciso que ao apresentar consultas, pergunte ao usuário se quer elas no conversa ou um documeto PDF com todas essas informações. É essencial que faça isso para evitar a poluição visual na conversa, assim prevenindo de que o usuário se confunda de alguma forma.\n    </messageFormat>\n\n    <CostAnalysis>\n      - Identificar automaticamente os 3 maiores centros de custo\n      - Avaliar distorções ou crescimento anormal de despesas\n      - Alertar gastos fora do padrão histórico\n    </CostAnalysis>\n\n    <CashFlowConsulting>\n      - Comparar prazo médio de recebimento e pagamento\n      - Avaliar impacto no capital de giro\n      - Classificar a situação como:\n        Saudável, Atenção ou Crítica\n    </CashFlowConsulting>\n\n    <NormativeConsulting>\n      Sempre seguir o Manual de Conduta Financeira.\n      Reforçar separação entre PF e PJ.\n      Propor alternativas corretas como:\n      - Pró-labore\n      - Antecipação de lucros\n      - Lançamentos contábeis adequados\n    </NormativeConsulting>\n  </BehaviorRules>\n\n  <ResponseFormat>\n    Sempre que aplicável, responder seguindo a estrutura:\n    1. Resumo Executivo\n    2. Análise Financeira (baseada em dados)\n    3. Riscos Identificados\n    4. Recomendações Práticas\n    5. Próximo Passo Sugerido\n  </ResponseFormat>\n\n  <Examples>\n    <Example>\n      <Description>Análise de Lucratividade Mensal</Description>\n      <Format>Texto Estruturado</Format>\n      <Content>\n        Pergunta: \"A empresa foi lucrativa em março?\"\n        Ação esperada:\n        - Ativar dadosFinanceiros\n        - Calcular lucro líquido do período\n        - Explicar os principais fatores do resultado\n      </Content>\n    </Example>\n\n    <Example>\n      <Description>Dúvida Contábil sobre Uso do Cartão</Description>\n      <Format>Texto Educativo</Format>\n      <Content>\n        Pergunta: \"Posso pagar despesas pessoais pela empresa?\"\n        Resposta esperada:\n        - Explicar por que não é recomendado\n        - Alertar riscos fiscais\n        - Sugerir pró-labore ou antecipação de lucros\n        - Orientar lançamento contábil correto\n      </Content>\n    </Example>\n  </Examples>\n\n  <FinalRule>\n    Você não é um chatbot genérico.\n    Você é o CFO da empresa.\n    Toda resposta deve proteger o caixa, a margem e a saúde financeira do negócio.\n  </FinalRule>\n\n</GeneratedPrompt>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        128
+      ],
+      "id": "492fe627-c3ce-4268-8775-cb264ab31853",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('variaveis').item.json.phoneNumber }}",
+        "text": "=O Banco de dados foi limpo.\n(Funcionalidade válida apenas durante o período de testes)"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -96
+      ],
+      "id": "a2d2640a-0464-476c-91c0-945d9bbf10fc",
+      "name": "Send text message",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Fugimura account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Acione essa ferramenta para fazer a analise e devolver a mesma ao usuário.",
+        "source": "=database",
+        "workflowId": {
+          "__rl": true,
+          "value": "{{CFO_DIGITAL___AGENTE_DE_CALCULOS_WORKFLOW_ID}}",
+          "mode": "list",
+          "cachedResultUrl": "{{SUBFLOW_WORKFLOW_URL}}",
+          "cachedResultName": "CFO Digital - Agente de calculos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userMessage": "={{ $fromAI('userMessage', `Envie neste campo a exata duvida do usuário`, 'string') }}",
+            "userNumber": "={{ $('variaveis').item.json.phoneNumber }}"
+          },
+          "matchingColumns": [
+            "userMessage"
+          ],
+          "schema": [
+            {
+              "id": "userMessage",
+              "displayName": "userMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "userNumber",
+              "displayName": "userNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        2224,
+        384
+      ],
+      "id": "4da63865-dc79-4b1e-aa3c-9c888d516cdf",
+      "name": "Call 'CFO Digital - Agente de calculos'"
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('variaveis').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        432,
+        -48
+      ],
+      "id": "a9e9b10f-664f-4bdf-a48e-65b176d3ce64",
+      "name": "Download media file",
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Fugimura account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('variaveis').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        512,
+        384
+      ],
+      "id": "5ad28ca6-b375-4ffa-a3fd-66d3f35c198e",
+      "name": "Download media file1",
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Fugimura account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('variaveis').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        512,
+        544
+      ],
+      "id": "de8343f8-fb1c-4438-85eb-86057679244a",
+      "name": "Download media file2",
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Fugimura account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('variaveis').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        512,
+        704
+      ],
+      "id": "8778d5b2-e463-419c-b762-0204d7a95779",
+      "name": "Download media file3",
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Fugimura account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        384
+      ],
+      "id": "62cd3601-aa5d-4718-afae-3a5e51364a6b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Acione essa ferramenta para colocar o conteúdo da analise em um PDF e enviar ao usuário.",
+        "workflowId": {
+          "__rl": true,
+          "value": "{{CFO_DIGITAL___ENVIO_DE_PDF_WORKFLOW_ID}}",
+          "mode": "list",
+          "cachedResultUrl": "{{SUBFLOW_WORKFLOW_URL}}",
+          "cachedResultName": "CFO Digital - Envio de pdf"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userNumber": "={{ $('variaveis').item.json.phoneNumber }}",
+            "formatacao": "Deixe os textos em arial 12, com titulos em negrito e em tamanho 14. espaçamento simples.",
+            "conteudo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conteudo', `Envie aqui o conteúdo que recebeu da tool Call CFO Digital - Agente de calculos e que tratou.`, 'string') }}",
+            "docDriveId": "{{GOOGLE_DOC_TEMPLATE_ID}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "conteudo",
+              "displayName": "conteudo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "docDriveId",
+              "displayName": "docDriveId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "formatacao",
+              "displayName": "formatacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "userNumber",
+              "displayName": "userNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        2048,
+        384
+      ],
+      "id": "1a0cb5af-53b4-4011-b3b2-a0c76291a584",
+      "name": "Call 'CFO Digital - Envio de pdf'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "verificaTipoMensagem": {
+      "main": [
+        [
+          {
+            "node": "Download media file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "messageText",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media file1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media file2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media file3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "audioTranscrito": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "messageText": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unificaMessage": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "messageGemini": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze video": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "audioTranscrito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "variaveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow2": {
+      "main": [
+        [
+          {
+            "node": "switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verificaContato": {
+      "main": [
+        [
+          {
+            "node": "verificaTipoMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "#sair": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "verificaContato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "variaveis": {
+      "main": [
+        [
+          {
+            "node": "#sair",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Send text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'CFO Digital - Agente de calculos'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media file": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media file1": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media file2": {
+      "main": [
+        [
+          {
+            "node": "Analyze video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media file3": {
+      "main": [
+        [
+          {
+            "node": "Analyze document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'CFO Digital - Envio de pdf'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "binaryMode": "separate"
+  },
+  "versionId": "{{VERSION_ID}}",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "{{WORKFLOW_ID}}",
+  "tags": []
+}
