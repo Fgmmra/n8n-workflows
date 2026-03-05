@@ -1,0 +1,202 @@
+{
+  "name": "Aroma-Café-text",
+  "nodes": [
+    {
+      "parameters": {
+        "amount": 1.5
+      },
+      "id": "cacb4405-01a6-4b12-b909-46b3e8d76b5d",
+      "name": "waitSeconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        -16
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a43bb549-71ea-4023-8bcd-8ce3b9dfbb08",
+      "name": "contentLoop",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        400,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "4c21b3cc-06f4-4b91-a9c9-e0dc401b33c5",
+      "name": "contentSplit",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "928f8c88-2bb4-40c3-8bd1-890d248b9365",
+              "name": "message",
+              "value": "={{ $json.message.split('\\n\\n').map(item => item.replace(/\\[|\\]/g, '')) }}",
+              "type": "array"
+            },
+            {
+              "id": "3196df60-b877-49a2-ab00-7437138cca28",
+              "name": "recipient",
+              "value": "={{ $json.phoneNumber }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        -80
+      ],
+      "id": "4cde6a25-1726-463f-a1cd-a62134073c33",
+      "name": "variaveisAmbiente"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "phoneNumber"
+            },
+            {
+              "name": "message"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        -80
+      ],
+      "id": "ff1ec85e-648c-4667-bcf2-0c5001913c44",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.recipient }}",
+        "text": "={{ $json.message.replace(/\\[NIN]/g, '').split('\\n\\n').join('\\n') }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -16
+      ],
+      "id": "26682f56-5335-45ce-9179-29e2535c8737",
+      "name": "Send text message",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "leonardo"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "waitSeconds": {
+      "main": [
+        [
+          {
+            "node": "contentLoop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contentLoop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contentSplit": {
+      "main": [
+        [
+          {
+            "node": "contentLoop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "variaveisAmbiente": {
+      "main": [
+        [
+          {
+            "node": "contentSplit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "variaveisAmbiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send text message": {
+      "main": [
+        [
+          {
+            "node": "waitSeconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "85200f39-12d3-4754-ae1a-babbfba7c73d",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "{{WORKFLOW_ID}}",
+  "tags": []
+}
