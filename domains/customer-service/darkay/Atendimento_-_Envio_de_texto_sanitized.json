@@ -1,0 +1,202 @@
+{
+  "name": "Atendimento - Envio de texto",
+  "nodes": [
+    {
+      "parameters": {
+        "amount": 1.5
+      },
+      "id": "c26d9217-f460-4a23-b8a4-3d52994536c4",
+      "name": "waitSeconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        96
+      ],
+      "webhookId": "{{WEBHOOK_ID}}"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "acfe6afb-aff7-469f-9ac0-12fbaa73518c",
+      "name": "contentLoop",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        416,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "6752dba4-3778-4508-8d55-ed1e4dffc0ce",
+      "name": "contentSplit",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        176,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "928f8c88-2bb4-40c3-8bd1-890d248b9365",
+              "name": "message",
+              "value": "={{ $json.message.split('\\n\\n').map(item => item.replace(/\\[|\\]/g, '').trim()) }}",
+              "type": "array"
+            },
+            {
+              "id": "3196df60-b877-49a2-ab00-7437138cca28",
+              "name": "recipient",
+              "value": "={{ $json.phoneNumber }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        32
+      ],
+      "id": "e56b0110-7dc3-4355-a7f0-5a4632cf8ffa",
+      "name": "variaveisAmbiente"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "phoneNumber"
+            },
+            {
+              "name": "message"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -256,
+        32
+      ],
+      "id": "2dd485d5-30e8-47ae-ae94-ae808e06c9eb",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.recipient }}",
+        "text": "={{ $json.message.replace(/\\[NIN]/g, '').split('\\n\\n').join('\\n') }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        96
+      ],
+      "id": "2c147be0-5eae-41ba-ac6e-14d5af2eaa05",
+      "name": "Send text message",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "uazApiApi": {
+          "id": "{{CREDENTIAL_ID}}",
+          "name": "UazAPI Darkay atendimento"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "waitSeconds": {
+      "main": [
+        [
+          {
+            "node": "contentLoop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contentLoop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contentSplit": {
+      "main": [
+        [
+          {
+            "node": "contentLoop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "variaveisAmbiente": {
+      "main": [
+        [
+          {
+            "node": "contentSplit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "variaveisAmbiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send text message": {
+      "main": [
+        [
+          {
+            "node": "waitSeconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "{{VERSION_ID}}",
+  "meta": {
+    "instanceId": "{{INSTANCE_ID}}"
+  },
+  "id": "{{WORKFLOW_ID}}",
+  "tags": []
+}
