@@ -1,0 +1,114 @@
+{
+  "name": "Notificador de Erros",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "aa13cf0b-714e-4325-80f3-0880b699e78c",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2667da89-a98b-48af-9624-40e8a2ad2155",
+              "name": "nodeError",
+              "value": "={{ $json.execution.lastNodeExecuted }}",
+              "type": "string"
+            },
+            {
+              "id": "d6d5c214-5b10-44c1-8d4c-51d7db8c433f",
+              "name": "workflowName",
+              "value": "={{ $json.workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "5d223a5b-6261-41b6-a1ef-5401b313b7fc",
+              "name": "errorMessage",
+              "value": "={{ $json.execution.error.message }}",
+              "type": "string"
+            },
+            {
+              "id": "4021ecd6-8578-41e5-97dc-45c70c4c6384",
+              "name": "executionUrl",
+              "value": "={{ $json.execution.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        0
+      ],
+      "id": "13186b04-9d67-4bc8-bad2-b9752aded229",
+      "name": "variaveis"
+    },
+    {
+      "parameters": {
+        "number": "120363425179251107@g.us",
+        "text": "=O projeto de nome \"{{ $json.workflowName }}\" está com problemas.\nExecução do erro: {{ $json.executionUrl }}\nNó/node onde ocorreu o erro: {{ $json.nodeError }}\nDescrição do erro: {{ $json.errorMessage }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        352,
+        0
+      ],
+      "id": "e7c5e9f5-f182-462e-bb43-8f35c525e5ab",
+      "name": "Send text message"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "variaveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "variaveis": {
+      "main": [
+        [
+          {
+            "node": "Send text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "7b8bddc2-ca51-4e20-aac2-a938c256c6f2",
+  "meta": {
+    "instanceId": "e14abecbeb88523dd432acda4b2bcec7caa30ea68d42bdb0b49a0bdd98b9ce8f"
+  },
+  "id": "NPPZH16mfC23Ram9CnI77",
+  "tags": [
+    {
+      "updatedAt": "2026-01-15T22:37:13.378Z",
+      "createdAt": "2026-01-15T22:37:13.378Z",
+      "id": "F8ytKNqIzdHrjCm1",
+      "name": "N8N"
+    }
+  ]
+}
