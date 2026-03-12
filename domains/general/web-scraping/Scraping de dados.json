@@ -1,0 +1,178 @@
+{
+  "name": "Scraping de dados",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c1b6f591-d2c0-4a85-aa2e-09f83f6e14d4",
+      "name": "Início",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Configuração inicial\nconst TOKEN = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjY2ZDZiMTI1ZWMzMzA4MTk1OTk0ZDFjZTgzN2Q3OWFmIiwidHlwIjoiSldUIn0.eyJuYmYiOjE3NTg1Njg3NjUsImV4cCI6MTkxNjI0ODc2NSwiaXNzIjoiaHR0cHM6Ly9pZC5rcm9vemUuY29tLmJyIiwiYXVkIjpbImh0dHBzOi8vaWQua3Jvb3plLmNvbS5ici9yZXNvdXJjZXMiLCJhcGkxIiwiSWRlbnRpdHlTZXJ2ZXJBcGkiXSwiY2xpZW50X2lkIjoicm8uY2xpZW50LmIyYyIsInN1YiI6ImFneG8uYjJjQGtyb296ZS5jb20uYnI6QUdYTyIsImF1dGhfdGltZSI6MTc1ODU2ODc2NSwiaWRwIjoibG9jYWwiLCJuYW1lIjoiVVNVQVJJTyBQQURSQU8gQUdYTyBCMkMiLCJpZCI6IjMzNjQ4MiIsImVtYWlsIjoiYWd4by5iMmNAa3Jvb3plLmNvbS5iciIsImNvbXBhbnlfY29kZSI6IkFHWE8iLCJ1c2VyX2NvbXBhbnlfY29kZSI6IkFHWE8iLCJjb21wYW55X2lkIjoiMTEiLCJjYW5fdmlld19wcmVzYWxlIjoiRmFsc2UiLCJyb2xlcyI6IlVTVV9CMkMsQjJDX1VTVSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVTVV9CMkMsQjJDX1VTVSIsImlzX211bHRpYnJhbmQiOiJGYWxzZSIsInNjb3BlIjpbIm9wZW5pZCIsInByb2ZpbGUiLCJhcGkxIiwiSWRlbnRpdHlTZXJ2ZXJBcGkiXSwiYW1yIjpbInBhc3N3b3JkIl19.Wk-a4b4ISDfD4eqqwdCXHQchT659EZstGqL9jZmKKtgwZ1_0YQcChdtnZ8U2SRqgR9ccQyczN5oxzDMgDDlkhtdRcAScox5hPLXPV8pMK6-4BhYOzxJJ0eucHL0Js9QHlZstuflL3bR3myc2txaMJ4sITAAjYVr_p0fKqO6j0l-b0N453Mnh5pl-cqK_YAL632eidB73u8hUNM9aWoaoL1Ce6iY7BjfD46fr1ikXidDQ9y7EDlbIB3NaMqQ8k24PDQnVLJYuOSnTEKclZDKZnliPU86hWZgU0isxUzfyh_5c-Jl0PuarZwhl6omsjOGUKdsS-HyDRSnnV9uPDIF2gg';\n\nconst TOTAL_PAGES = 23;\nconst pages = [];\n\nfor (let i = 1; i <= TOTAL_PAGES; i++) {\n  pages.push({\n    json: {\n      page: i,\n      token: TOKEN,\n      totalPages: TOTAL_PAGES\n    }\n  });\n}\n\nreturn pages;"
+      },
+      "id": "d7fa7df6-bdb4-40cf-94fe-59a58b022883",
+      "name": "Gerar Lista de Páginas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processar os resultados de cada página\nconst data = $input.item.json;\nconst results = data.data?.results || [];\nconst currentPage = data.data?.pagination?.currentPage || 0;\nconst totalPages = data.data?.pagination?.totalPages || 0;\nconst totalItems = data.data?.pagination?.totalItems || 0;\n\nconst cruzeiros = [];\n\nfor (const result of results) {\n  const departure = result.departureOptions?.[0] || {};\n  const cruiseLine = departure.cruiseLine || {};\n  const ship = departure.ship || {};\n  const fares = departure.fares || [];\n  const benefits = departure.sailingBenefits || [];\n\n  // Montar preços por tipo de cabine\n  const precos = {};\n  for (const fare of fares) {\n    if (fare.totalAmount > 0) {\n      precos[fare.type] = {\n        valorTotal: fare.totalAmount,\n        valorCabine: fare.cabinAmountWithNCF,\n        categoria: fare.categoryCode,\n        maisBarato: fare.isCheapest\n      };\n    }\n  }\n\n  // Formatar data (ex: 20270329 -> 29/03/2027)\n  const dateRaw = String(departure.date || '');\n  const dataFormatada = dateRaw.length === 8\n    ? `${dateRaw.slice(6,8)}/${dateRaw.slice(4,6)}/${dateRaw.slice(0,4)}`\n    : dateRaw;\n\n  // Benefícios como lista simples\n  const beneficiosList = benefits.map(b => b.name).join(', ');\n\n  cruzeiros.push({\n    json: {\n      // Identificação\n      codigoViagem: result.sailingCode,\n      codigoItinerario: result.itinerary?.itineraryCode,\n      pagina: currentPage,\n      totalPaginas: totalPages,\n      totalItinerarios: totalItems,\n\n      // Rota\n      embarque: result.departure?.name,\n      codigoEmbarque: result.departure?.code,\n      desembarque: result.arrive?.name,\n      codigoDesembarque: result.arrive?.code,\n\n      // Destino e itinerário\n      destino: result.itinerary?.destination,\n      itinerario: result.itinerary?.name,\n\n      // Companhia e navio\n      companhiaCruzeiro: cruiseLine.name,\n      codigoCompanhia: cruiseLine.code,\n      navio: ship.name,\n      codigoNavio: ship.code,\n\n      // Datas\n      dataPartida: dataFormatada,\n      noites: departure.nights,\n\n      // Preços\n      melhorPrecoTotal: result.bestTotalAmount,\n      melhorPrecoCabine: result.bestCabinAmountWithNCF,\n      precosCabine: JSON.stringify(precos),\n\n      // Extras\n      beneficios: beneficiosList,\n      vooDisponivel: result.flightsAvailable,\n      pacotePrePos: result.prePostPackageAvailable,\n      reservaOnline: cruiseLine.onlineBooking\n    }\n  });\n}\n\nreturn cruzeiros;"
+      },
+      "id": "03f89b69-3399-4601-b27e-24cd367b640d",
+      "name": "Processar e Normalizar Dados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "cruzeiros",
+        "options": {}
+      },
+      "id": "c20343fe-9cca-44b9-a8aa-41b746b2e808",
+      "name": "Agregar Todos os Cruzeiros",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Consolidar todos os cruzeiros em um único array\nconst todosOsItems = $input.all();\nconst todosCruzeiros = [];\n\nfor (const item of todosOsItems) {\n  const cruzeiros = item.json.cruzeiros || [];\n  for (const c of cruzeiros) {\n    todosCruzeiros.push(c);\n  }\n}\n\n// Ordenar por data de partida\ntodosCruzeiros.sort((a, b) => {\n  const dateA = a.dataPartida?.split('/').reverse().join('') || '';\n  const dateB = b.dataPartida?.split('/').reverse().join('') || '';\n  return dateA.localeCompare(dateB);\n});\n\n// Remover duplicatas pelo código da viagem\nconst vistos = new Set();\nconst semDuplicatas = todosCruzeiros.filter(c => {\n  if (vistos.has(c.codigoViagem)) return false;\n  vistos.add(c.codigoViagem);\n  return true;\n});\n\nreturn [{\n  json: {\n    totalColetados: semDuplicatas.length,\n    dataExtracao: new Date().toLocaleString('pt-BR'),\n    cruzeiros: semDuplicatas\n  }\n}];"
+      },
+      "id": "db31dddc-2af4-461a-ad79-6db8c3a5cb14",
+      "name": "Consolidar e Deduplicar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Converter para linhas individuais para exportação em planilha\nconst data = $input.item.json;\nconst cruzeiros = data.cruzeiros || [];\n\nreturn cruzeiros.map(c => ({ json: c }));"
+      },
+      "id": "8bb87fc1-4cca-49f3-a3ac-2fd4be3baac8",
+      "name": "Expandir para Linhas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        480,
+        -240
+      ],
+      "id": "4447f00d-fa85-4b0b-935f-ab117a76749c",
+      "name": "Buscar na web",
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Início": {
+      "main": [
+        [
+          {
+            "node": "Gerar Lista de Páginas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Lista de Páginas": {
+      "main": [
+        [
+          {
+            "node": "Buscar na web",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar e Normalizar Dados": {
+      "main": [
+        [
+          {
+            "node": "Agregar Todos os Cruzeiros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agregar Todos os Cruzeiros": {
+      "main": [
+        [
+          {
+            "node": "Consolidar e Deduplicar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar e Deduplicar": {
+      "main": [
+        [
+          {
+            "node": "Expandir para Linhas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar na web": {
+      "main": [
+        [
+          {
+            "node": "Processar e Normalizar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6a9ad7a7-50d2-400d-b450-36b44ff5919d",
+  "meta": {
+    "instanceId": "e14abecbeb88523dd432acda4b2bcec7caa30ea68d42bdb0b49a0bdd98b9ce8f"
+  },
+  "id": "ndpyNQFh1Gp6UrUZ",
+  "tags": []
+}
