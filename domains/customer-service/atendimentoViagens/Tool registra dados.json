@@ -1,0 +1,436 @@
+{
+  "name": "Tool Enviar dados Agaxtur",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "c2uC3VRnvOEUFjrN",
+          "mode": "list",
+          "cachedResultName": "data trigger agaxtur",
+          "cachedResultUrl": "/projects/5OunNy8IMpNCEwsl/datatables/c2uC3VRnvOEUFjrN"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "numero",
+              "keyValue": "={{ $json[\"TEL PAX\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "12f58b4b-2e3c-4117-86bd-0f6473cc4313",
+      "name": "apaga da planilha1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/113Ct9i1WVpEztpzGHs2PqTLQjwE0m0iwdyEvFzZB2uE/edit",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/113Ct9i1WVpEztpzGHs2PqTLQjwE0m0iwdyEvFzZB2uE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('vars').item.json.session_id }}",
+            "CLIENTE": "={{ $('vars').item.json.CLIENTE }}",
+            "E-MAIL": "={{ $('vars').item.json[\"E-MAIL\"] }}",
+            "DESTINO": "={{ $('vars').item.json.DESTINO }}",
+            "DATA VIAGEM": "={{ $('vars').item.json[\"DATA VIAGEM\"] }}",
+            "QT PAX": "={{ $('vars').item.json[\"QT PAX\"] }}",
+            "TEL PAX": "={{ $('vars').item.json[\"TEL PAX\"] }}",
+            "STATUS": "=novo",
+            "DATA DE ENTRADA": "={{    $now     .setZone('America/Sao_Paulo')     .toFormat(\"yyyy-MM-dd HH:mm\") }}"
+          },
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CLIENTE",
+              "displayName": "CLIENTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "E-MAIL",
+              "displayName": "E-MAIL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DESTINO",
+              "displayName": "DESTINO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATA VIAGEM",
+              "displayName": "DATA VIAGEM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "QT PAX",
+              "displayName": "QT PAX",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TEL PAX",
+              "displayName": "TEL PAX",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "STATUS",
+              "displayName": "STATUS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATA DE ENTRADA",
+              "displayName": "DATA DE ENTRADA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        704,
+        0
+      ],
+      "id": "b60eab49-b378-4d0f-95bf-03d5504854c5",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0WPEcUzrCeLWxVEj",
+          "name": "Sheets Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "session_id"
+            },
+            {
+              "name": "CLIENTE"
+            },
+            {
+              "name": "E-MAIL"
+            },
+            {
+              "name": "DESTINO"
+            },
+            {
+              "name": "DATA VIAGEM"
+            },
+            {
+              "name": "QT PAX"
+            },
+            {
+              "name": "TEL PAX"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3d4c22e5-666e-47df-8b99-16f492e05f28",
+      "name": "vars"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Utilize esta ferramenta para registrar os dados do cliente na planilha de controle sempre que ele fornecer suas informações de contato (nome, e-mail, etc.) com a intenção de solicitar um orçamento, fazer uma reserva ou falar com um consultor.",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/113Ct9i1WVpEztpzGHs2PqTLQjwE0m0iwdyEvFzZB2uE/edit",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/113Ct9i1WVpEztpzGHs2PqTLQjwE0m0iwdyEvFzZB2uE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('variaveis').item.json.conversationId }}",
+            "CLIENTE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('CLIENTE', `Nome do cliente`, 'string') }}",
+            "E-MAIL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('E-MAIL', `e-mail do cliente`, 'string') }}",
+            "DESTINO": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DESTINO', `destino que o cliente tem interesse`, 'string') }}",
+            "DATA VIAGEM": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DATA_VIAGEM', `data que o cliente tem interesse`, 'string') }}",
+            "STATUS": "novo",
+            "DATA DE ENTRADA": "={{ \n  $now\n    .setZone('America/Sao_Paulo')\n    .toFormat(\"yyyy-MM-dd HH:mm\")\n}}",
+            "QT PAX": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('QT_PAX', `quantidade de passageiros`, 'string') }}",
+            "TEL PAX": "={{ $('variaveis').item.json.recipientPhone }}"
+          },
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CLIENTE",
+              "displayName": "CLIENTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "E-MAIL",
+              "displayName": "E-MAIL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DESTINO",
+              "displayName": "DESTINO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATA VIAGEM",
+              "displayName": "DATA VIAGEM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "QT PAX",
+              "displayName": "QT PAX",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TEL PAX",
+              "displayName": "TEL PAX",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "STATUS",
+              "displayName": "STATUS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATA DE ENTRADA",
+              "displayName": "DATA DE ENTRADA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1648,
+        288
+      ],
+      "id": "7bbbee5c-b7ce-49ab-9125-0970d68d827b",
+      "name": "enviar dados para consultor1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0WPEcUzrCeLWxVEj",
+          "name": "Sheets Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "53cb57ee-6257-4826-99ee-609a3180da63",
+      "name": "Wait",
+      "webhookId": "954f519e-2ffd-4247-adcc-4c8712e63810"
+    }
+  ],
+  "pinData": {
+    "vars": [
+      {
+        "json": {
+          "session_id": 177,
+          "CLIENTE": "Gustavo Bispo",
+          "E-MAIL": "gustavobiscordeiro@gmail.com",
+          "DESTINO": "Índia",
+          "DATA VIAGEM": "08/09",
+          "QT PAX": "2",
+          "TEL PAX": "+5511958751561"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "apaga da planilha1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "vars": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviar dados para consultor1": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "apaga da planilha1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1674ee37-2d65-4277-9ca2-39a6bcec8e59",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e14abecbeb88523dd432acda4b2bcec7caa30ea68d42bdb0b49a0bdd98b9ce8f"
+  },
+  "id": "8yZWit3qcjRbsuXd",
+  "tags": []
+}

@@ -1,0 +1,304 @@
+{
+  "name": "generic-buffer",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Presets').item.json.redisListKey }}",
+        "messageData": "={{ $json.body.message }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        176
+      ],
+      "id": "551f434b-81ca-420a-a8d2-2d29335870d5",
+      "name": "Push Content",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "redis": {
+          "id": "O5D3ptYK9ag8lTwq",
+          "name": "Redis Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 11
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -848,
+        176
+      ],
+      "id": "a7d433ce-59b7-46df-a3a3-c001666d4466",
+      "name": "Wait",
+      "webhookId": "57e60403-0eb8-4294-95e9-6f875ee7a1f9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5b7aa784-a6be-43fa-9615-94c935c6da16",
+              "name": "redisListKey",
+              "value": "=services:message-buffering:{{ $json.phoneNumber }}",
+              "type": "string"
+            },
+            {
+              "id": "4ddd3c79-204b-4c00-9d70-d3c0b46564a8",
+              "name": "body.message",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1376,
+        176
+      ],
+      "id": "2247fd18-3e6b-4b6e-b0ad-2e3ee356b45a",
+      "name": "Presets"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "messages",
+        "key": "={{ $('Presets').item.json.redisListKey }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        176
+      ],
+      "id": "4dcf3264-b219-4d35-9ec2-4abfb59ca439",
+      "name": "Get Last Content",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "redis": {
+          "id": "O5D3ptYK9ag8lTwq",
+          "name": "Redis Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Presets').item.json.redisListKey }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        224,
+        144
+      ],
+      "id": "8720dee0-20e3-4f57-80ac-49e580b90851",
+      "name": "Delete Buffered Messages",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "redis": {
+          "id": "O5D3ptYK9ag8lTwq",
+          "name": "Redis Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6897383d-a1db-4afe-adb5-258feb486e50",
+              "leftValue": "={{ $json.messages[0] }}",
+              "rightValue": "={{ $('Push Content').item.json.body.message }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "9a029c86-0075-49e1-977d-b37c33f0bb71",
+      "name": "Verificar se há nova mensagem",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "306c10eb-79c8-48a7-8aa8-76b6ebf14f89",
+              "name": "message",
+              "value": "={{ $json.messages.map((_, index, arr) => arr[arr.length - 1 - index]).join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bc543581-898f-4dde-b8b9-59658fa5fa9a",
+      "name": "Capturar lista de mensagens",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message"
+            },
+            {
+              "name": "phoneNumber"
+            },
+            {
+              "name": "delayTimeMs"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1584,
+        176
+      ],
+      "id": "4a7f86af-4c7e-4dac-9585-5262a5193c2d",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "message": "Quero",
+          "phoneNumber": "5511963277834",
+          "delayTimeMs": "140000"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Push Content": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Last Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Presets": {
+      "main": [
+        [
+          {
+            "node": "Push Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Last Content": {
+      "main": [
+        [
+          {
+            "node": "Verificar se há nova mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar se há nova mensagem": {
+      "main": [
+        [
+          {
+            "node": "Capturar lista de mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capturar lista de mensagens": {
+      "main": [
+        [
+          {
+            "node": "Delete Buffered Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Presets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "06ea670a-cf2b-4412-bd1b-5d210fc390e2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e14abecbeb88523dd432acda4b2bcec7caa30ea68d42bdb0b49a0bdd98b9ce8f"
+  },
+  "id": "kih_nVamnz28OLBdj1pXY",
+  "tags": []
+}

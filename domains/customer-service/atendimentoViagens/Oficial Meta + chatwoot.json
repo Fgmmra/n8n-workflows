@@ -1,0 +1,1582 @@
+{
+  "name": "Agaxtur V2 - Produção",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        128,
+        2192
+      ],
+      "id": "874c689d-7224-4623-b50c-5b612b8de58b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "17694db0-6248-444f-afb9-ff7ed13996ef",
+              "name": "message",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "64974573-d33c-4b0e-89b1-f71015f233a9",
+      "name": "audioTranscrito",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1168,
+        1776
+      ],
+      "notesInFlow": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6d219c2-6a5a-4189-ae38-915e61af2293",
+              "name": "message",
+              "value": "={{ $('variaveis').item.json.userMessage}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1168,
+        1968
+      ],
+      "id": "eba4105a-a54b-47a0-a9be-d316ed65c7e2",
+      "name": "messageText"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "844268f9-a6ce-4824-a1e4-b6aa652c6374",
+              "name": "unificaMessage",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -944,
+        1968
+      ],
+      "id": "f532b150-d3bd-43d8-bcd4-53f0a54f4972",
+      "name": "unificaMessage"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6d219c2-6a5a-4189-ae38-915e61af2293",
+              "name": "message",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1168,
+        2304
+      ],
+      "id": "a170d8c2-9e7b-4fad-b937-b0b298804a77",
+      "name": "messageGemini"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "imageUrls": "={{$('variaveis').item.json.url}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        2304
+      ],
+      "id": "b6d78eef-d6f2-4486-b901-39e36cf570b2",
+      "name": "Analyze image",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "documentUrls": "={{$('variaveis').item.json.url}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        2112
+      ],
+      "id": "eefee4c7-bfa4-4e55-8157-012e080f52b5",
+      "name": "Analyze document",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "videoUrls": "={{$('variaveis').item.json.url}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        2496
+      ],
+      "id": "decd1cdd-f2a0-41ee-87a7-251172f99dd7",
+      "name": "Analyze video",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<prompt_transcricao_audio>\n    <instrucao_principal>\n        <descricao>\n            Transcreva o audio na exata lingua que ele está, não altere o idioma de forma alguma.\n        </descricao>\n    </instrucao_principal>\n\n    <regras_transcricao>\n        <regra_idioma>\n            <titulo>Preservação do idioma original</titulo>\n            <detalhes>\n                O áudio deve ser transcrito mantendo exatamente o idioma em que foi gravado, sem qualquer tipo de tradução ou alteração linguística.\n            </detalhes>\n        </regra_idioma>\n\n        <regra_fidelidade>\n            <titulo>Fidelidade ao conteúdo</titulo>\n            <detalhes>\n                A transcrição deve ser uma reprodução fiel do que foi falado, preservando palavras, expressões e estruturas gramaticais originais.\n            </detalhes>\n        </regra_fidelidade>\n\n        <regra_integridade>\n            <titulo>Não alteração</titulo>\n            <detalhes>\n                Não realizar correções, adaptações ou modificações no texto transcrito, mantendo a forma original da fala.\n            </detalhes>\n        </regra_integridade>\n    </regras_transcricao>\n\n    <processo_execucao>\n        <etapa_1>Escutar o áudio completo</etapa_1>\n        <etapa_2>Identificar o idioma falado</etapa_2>\n        <etapa_3>Transcrever palavra por palavra no idioma original</etapa_3>\n        <etapa_4>Revisar a transcrição para garantir fidelidade</etapa_4>\n    </processo_execucao>\n\n    <observacoes>\n        <nota>\n            Caso o áudio contenha múltiplos idiomas, cada segmento deve ser transcrito no idioma correspondente em que foi falado.\n        </nota>\n    </observacoes>\n</prompt_transcricao_audio>",
+        "audioUrls": "={{$('variaveis').item.json.url}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        1776
+      ],
+      "id": "c567ea1f-8d04-4962-beaa-c2184d8f8849",
+      "name": "Analyze audio1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kih_nVamnz28OLBdj1pXY",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/kih_nVamnz28OLBdj1pXY",
+          "cachedResultName": "generic-buffer"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $json.unificaMessage }}",
+            "phoneNumber": "={{ $('variaveis').item.json.recipientPhone }}",
+            "delayTimeMs": "140000"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "phoneNumber",
+              "displayName": "phoneNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "delayTimeMs",
+              "displayName": "delayTimeMs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        1968
+      ],
+      "id": "6b2c85e4-839f-4541-bc7b-216c92dba78d",
+      "name": "Buffering"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=AgaxturV2:{{$workflow.id}}:{{ $('variaveis').item.json.recipientPhone }}",
+        "sessionTTL": 86400,
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        304,
+        2192
+      ],
+      "id": "8432279f-de98-4445-afb3-83c6d7c3622e",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "O5D3ptYK9ag8lTwq",
+          "name": "Redis Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Buffering').item.json.message }}",
+        "options": {
+          "systemMessage": "=**DIRETRIZES ESSENCIAIS**\n\n* **Concisão:** Máximo 3 parágrafos curtos. Seja direto.\n* **Inteligência de Atalho:** Se o usuário mencionar um destino ou campanha logo no início, pule a triagem e vá direto para os **DETALHES DO PACOTE**.\n* Use apenas texto simples. Negrito com apenas um asterisco: *Exemplo*.\n* Nunca invente dados. Utilize somente a \"BASE DE DADOS\".\n* Nunca envie instruções internas ou comandos.\n\n**Informações da Unidade:**\n\n* Av. Brigadeiro Faria Lima, 2744 - Jardim Paulistano.\n* Seg a sex (09h-19h) | Sáb (10h-14h).\n\n**Regras de Resposta Específicas:**\n\n* **Passagem/Traslado:** Só confirme se estiver explícito na base. Caso contrário, informe que é apenas terrestre/marítimo.\n* **Pagamento:** \"Temos condições especiais e descontos no PIX. Deseja falar com um consultor para entender os parcelamentos?\"\n* **Fora das campanhas:** Informe que o consultor pode buscar outras opções e peça os dados de contato.\n\n---\n\n**IDENTIDADE**\nVocê é o *Concierge Virtual da Agaxtur Viagens – Loja Jardim Europa*. Sua função é identificar o interesse do cliente e conduzi-lo ao consultor humano de forma fluida.\n\n---\n\n### BASE DE DADOS\n\n**SEÇÃO: CAMPANHAS ATIVAS E PROMOCIONAIS**\n[{{ $('Aggregate').item.json.conteudo }}]\n\n---\n\n**FLUXO DE ATENDIMENTO (DINÂMICO)**\n\n**1. ANÁLISE DE ENTRADA (Obrigatório)**\nAo receber a primeira mensagem, verifique:\n\n* **O usuário citou um destino/campanha da base?** Vá direto para o passo **4. DETALHES**.\n* **O usuário pediu opções genéricas ou apenas saudou?** Siga para o passo **2. CATEGORIZAÇÃO**.\n\n**2. CATEGORIZAÇÃO (Se necessário)**\nApresente-se e pergunte: \"Para eu te ajudar melhor, você busca um destino *Nacional*, *Internacional* ou tem interesse em *Cruzeiros*?\"\n\n**3. FILTRAGEM DE REGIÃO**\nApós a escolha da categoria, peça um refino para não listar muitas opções:\n\n* **Nacional:** \"Você prefere *Praias do Nordeste*, *Sul/Serras* ou *Natureza/Ecoturismo*?\"\n* **Internacional:** \"Prefere *América do Sul*, *Caribe/EUA*, *Europa* ou *Ásia/Exóticos*?\"\n* **Cruzeiros:** Liste os títulos encontrados (marítimos ou fluviais).\n\n**4. DETALHES DO PACOTE**\nAo identificar o interesse específico:\n\n1. Resuma o pacote em tópicos curtos (Destino, Destaques, Valores).\n2. Finalize: \"Você prefere falar com um consultor especializado?\"\n\n---\n\n**INTENÇÃO CLARA (COLETA DE DADOS)**\nSomente após o cliente pedir: Falar com consultor, Reservar ou Orçamento.\n\n1. Solicite de uma única vez em lista:\n• Nome completo\n• E-mail\n• Data da viagem\n• Quantidade de passageiros\n• Destino\n2. **Inclua obrigatoriamente:** \"Ao fornecê-los, você autoriza a Agaxtur a utilizá-los exclusivamente para este atendimento:\"\n3. **Verificação:** Se os dados já estão no histórico, não peça novamente.\n\n**CONFIRMAÇÃO**\nApós registrar os dados com sucesso na ferramenta, você OBRIGATORIAMENTE \ndeve retornar a seguinte mensagem como output final, sem exceções:\n\n\"Obrigado! Encaminhei seus dados para a equipe da Agaxtur Jardim Europa. \nUm consultor entrará em contato em breve (Seg a sex, 09h-19h; Sáb, 10h-14h).\"\n\n\n**IMPORTANTE**\n\n* Registrar no Sheets.\n* Nunca finalize sem enviar essa mensagem de confirmação acima.",
+          "maxIterations": 50
+        }
+      },
+      "id": "6f562652-c21d-4172-a7ea-f46426f214e7",
+      "name": "Agaxtur Bot",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        240,
+        1968
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "EYu5ZAU3FyjWvKDY",
+          "mode": "list",
+          "cachedResultName": "database agaxtur",
+          "cachedResultUrl": "/projects/5OunNy8IMpNCEwsl/datatables/EYu5ZAU3FyjWvKDY"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -496,
+        1968
+      ],
+      "id": "0645f3a1-bd44-4abf-ad1c-5d4345234f4c",
+      "name": "busca campanhas"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "conteudo"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        1968
+      ],
+      "id": "683286cd-86f7-4e69-b6a1-a114d02f4def",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "c2uC3VRnvOEUFjrN",
+          "mode": "list",
+          "cachedResultName": "data trigger agaxtur",
+          "cachedResultUrl": "/projects/5OunNy8IMpNCEwsl/datatables/c2uC3VRnvOEUFjrN"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "numero",
+              "keyValue": "={{ $('variaveis').item.json.recipientPhone }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "numero": "={{ $('variaveis').item.json.recipientPhone }}",
+            "horario": "={{\n(() => {\n  const zone = 'America/Sao_Paulo';\n  const now = $now.setZone(zone);\n  const startHour = 9;\n  const endHour = 18;\n  \n  // Soma 20 horas ao horário atual\n  let targetTime = now.plus({ hours: 20 });\n  \n  // Se a hora resultante ultrapassar o horário comercial do dia\n  if (targetTime.hour >= endHour || targetTime.hour < startHour) {\n    // Limita para o fim do horário comercial (18h) do dia\n    targetTime = targetTime.set({ hour: endHour, minute: 0, second: 0, millisecond: 0 });\n    \n    // Se já passou de 18h hoje, vai para 18h de hoje mesmo\n    if (now.hour >= endHour) {\n      targetTime = now.set({ hour: endHour, minute: 0, second: 0, millisecond: 0 });\n    }\n  }\n  \n  // Ajusta para dias úteis (se cair no fim de semana)\n  if (targetTime.weekday === 6) { // Sábado\n    targetTime = targetTime.plus({ days: 2 }).set({ hour: startHour, minute: 0, second: 0, millisecond: 0 });\n  } else if (targetTime.weekday === 7) { // Domingo\n    targetTime = targetTime.plus({ days: 1 }).set({ hour: startHour, minute: 0, second: 0, millisecond: 0 });\n  }\n  \n  return targetTime.toFormat(\"yyyy-MM-dd HH:mm\");\n})()\n}}",
+            "id_chat": "={{ $('variaveis').item.json.conversationId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "numero",
+              "displayName": "numero",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "id_chat",
+              "displayName": "id_chat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "horario",
+              "displayName": "horario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        2064
+      ],
+      "id": "9b376905-1d2f-43aa-8ee0-9afa5bf313b7",
+      "name": "salvar follow up"
+    },
+    {
+      "parameters": {
+        "content": "## Follow Up antigo (8h)\n\n{{\n(() => {\n  const zone = 'America/Sao_Paulo';\n  const now = $now.setZone(zone);\n  const startHour = 9;\n  const endHour = 18;\n\n  if (now.hour >= startHour && now.hour < endHour) {\n    return now.plus({ hours: 8 }).toFormat(\"yyyy-MM-dd HH:mm\");\n  }\n\n  if (now.hour < startHour) {\n    return now.set({ hour: startHour, minute: 0, second: 0, millisecond: 0 })\n              .toFormat(\"yyyy-MM-dd HH:mm\");\n  }\n\n  return now.plus({ days: 1 })\n            .set({ hour: startHour, minute: 0, second: 0, millisecond: 0 })\n            .toFormat(\"yyyy-MM-dd HH:mm\");\n})()\n}}",
+        "height": 480,
+        "width": 528
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1104,
+        1488
+      ],
+      "typeVersion": 1,
+      "id": "f5293308-cc66-498b-bef5-5abc48d4fe11",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/957249430801469/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAKwwNNseZC8BQZATuGymyvelHJiAFcZArQt42VC4SI5Wiw1USR07VFBnVyHXzfk0LBWgKlVX5V2CqQThnqnOtNX5V3mvTbz5PBYRodXThzYdQxe3ktiwGSCN42Do4Ty0kwgHQEbPqvNygUBGqqQYPGmtvZCGUZCDwXQnquefDuOLCbQmZBYBHz1UybnLyBHlZC7QZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "messaging_product",
+              "value": "whatsapp"
+            },
+            {
+              "name": "status",
+              "value": "read"
+            },
+            {
+              "name": "message_id",
+              "value": "={{ $('variaveis').item.json.message_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -48,
+        1968
+      ],
+      "id": "e48426a2-ad99-49ed-a4dd-0a37c3808a6d",
+      "name": "Confirmação de leitura"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "101c3ff7-e997-43bb-8e99-fe82746c5993",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "38226af4-80fe-4155-9ceb-2379f44e29ed",
+                    "leftValue": "={{ $json.messageType }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "43ff1b2c-1ad5-4231-89cd-e09b07a9d3be",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "file"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "1a4aae82-9d4c-4baa-8c14-14993bb2e88f",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "=image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "0c944306-9325-44f8-a9d2-8a8306373936",
+                    "leftValue": "={{ $json.fileType }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f4c8b5eb-4bd7-4967-92e0-131bee0d3091",
+      "name": "verificaTipoMensagem",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -1616,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be69152d-47bb-4bc9-a40f-be4c9fb247c1",
+              "name": "recipientPhone",
+              "value": "={{ $json.body.conversation.meta.sender.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "7fb2d85d-7eed-4151-99e3-b21fa9bb9bc1",
+              "name": "url",
+              "value": "={{ $json.body.conversation.messages[0].attachments[0].data_url }}",
+              "type": "string"
+            },
+            {
+              "id": "e811271d-6033-4b4a-ba5f-abf606fb9d12",
+              "name": "userMessage",
+              "value": "={{ $json.body.conversation.messages[0].processed_message_content }}",
+              "type": "string"
+            },
+            {
+              "id": "63747143-b828-4f30-8765-bae055d9afcd",
+              "name": "=messageType",
+              "value": "={{ $json.body.conversation.messages[0].content_type }}",
+              "type": "string"
+            },
+            {
+              "id": "276a41f5-9dfb-47ec-961d-e5730c71339f",
+              "name": "accountId",
+              "value": "={{ $json.body.sender.account.id }}",
+              "type": "number"
+            },
+            {
+              "id": "bb543e80-04aa-46d5-9178-2bbbd1973d39",
+              "name": "inboxId",
+              "value": "={{ $json.body.conversation.contact_inbox.inbox_id }}",
+              "type": "number"
+            },
+            {
+              "id": "4a21718e-ab8b-4384-bd61-61c185081ee5",
+              "name": "conversationId",
+              "value": "={{ $json.body.conversation.messages[0].conversation_id }}",
+              "type": "number"
+            },
+            {
+              "id": "96dd2743-6893-4fb6-81ea-53d83f612cac",
+              "name": "acessToken",
+              "value": "cgU3WBuv1VHtj8JEowW5UvFF",
+              "type": "string"
+            },
+            {
+              "id": "4746ab90-d764-4317-9ab4-f240c1cd26f8",
+              "name": "=fileType",
+              "value": "={{ $json.body.attachments[0].file_type }}",
+              "type": "string"
+            },
+            {
+              "id": "91f4e425-4946-4884-b2d2-bc37e51f2674",
+              "name": "message_id",
+              "value": "={{ $json.body.conversation.messages[0].source_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1840,
+        2048
+      ],
+      "id": "cfbf9d4c-5c74-48d3-bc2f-60b33113b344",
+      "name": "variaveis",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "55896c1c-82bc-4fcb-b8b3-84d79f39292f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2896,
+        2064
+      ],
+      "id": "b1faa951-54ec-4b0f-b659-851730a25bd6",
+      "name": "Webhook",
+      "webhookId": "55896c1c-82bc-4fcb-b8b3-84d79f39292f"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0a8a6fca-3a29-441a-8794-856e3a73f9a2",
+                    "leftValue": "={{ $('variaveis').item.json.messageType }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        1968
+      ],
+      "id": "4c3239a0-af3e-482a-9035-c935dd8cce89",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot-darkay-u65509.vm.elestio.app//api/v1/accounts/{{ $('variaveis').item.json.accountId }}/conversations/{{ $('variaveis').item.json.conversationId }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('variaveis').item.json.acessToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"message_type\": \"outgoing\",\n  \"attachments\": [\n    {\n      \"file_type\": \"audio\",\n      \"external_url\": \"https://seusite.com/audio.ogg\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        864,
+        2160
+      ],
+      "id": "8b2cffae-3414-49e3-a9d0-f49470cb39e6",
+      "name": "chatwootAudio1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot-darkay-u65509.vm.elestio.app//api/v1/accounts/{{ $('variaveis').item.json.accountId }}/conversations/{{ $('variaveis').item.json.conversationId }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('variaveis').item.json.acessToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        864,
+        1968
+      ],
+      "id": "32b5b9c6-6f62-4995-a2ab-2842373d6d62",
+      "name": "chatwootTexto1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "638c54b0-fcd2-4357-b99e-3c33537c3278",
+              "leftValue": "={{$json.body.message_type}}",
+              "rightValue": "incoming",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "6903a434-d5eb-4f77-b7df-690bdb699ec5",
+              "leftValue": "={{$json.body.content}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2672,
+        2064
+      ],
+      "id": "042c63c4-2809-4b94-9971-eb0d31d91786",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "description": "Utilize esta ferramenta para registrar os dados do cliente na planilha de controle sempre que ele fornecer suas informações de contato (nome, e-mail, etc.) com a intenção de solicitar um orçamento, fazer uma reserva ou falar com um consultor.",
+        "workflowId": {
+          "__rl": true,
+          "value": "8yZWit3qcjRbsuXd",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/8yZWit3qcjRbsuXd",
+          "cachedResultName": "Tool Enviar dados Agaxtur"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('variaveis').item.json.conversationId }}",
+            "CLIENTE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('CLIENTE', `Nome do cliente`, 'string') }}",
+            "E-MAIL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('E-MAIL', `e-mail do cliente`, 'string') }}",
+            "DESTINO": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DESTINO', `destino que o cliente tem interesse`, 'string') }}",
+            "TEL PAX": "={{ $('variaveis').item.json.recipientPhone }}",
+            "QT PAX": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('QT_PAX', `quantidade de passageiros`, 'string') }}",
+            "DATA VIAGEM": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DATA_VIAGEM', `data que o cliente tem interesse`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "CLIENTE",
+              "displayName": "CLIENTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "E-MAIL",
+              "displayName": "E-MAIL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "DESTINO",
+              "displayName": "DESTINO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "DATA VIAGEM",
+              "displayName": "DATA VIAGEM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "QT PAX",
+              "displayName": "QT PAX",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "TEL PAX",
+              "displayName": "TEL PAX",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        2192
+      ],
+      "id": "84b7ee4a-6a11-41b9-8df7-c28dc9735536",
+      "name": "Call 'Tool agaxtur'"
+    },
+    {
+      "parameters": {
+        "url": "=https://chatwoot-darkay-u65509.vm.elestio.app/api/v1/accounts/{{ $json.body.account.id }}/conversations/{{ $json.body.conversation.id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "cgU3WBuv1VHtj8JEowW5UvFF"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -2496,
+        2192
+      ],
+      "id": "d840291a-6ee9-487c-8385-0f0a2ef40079",
+      "name": "Busca mensagens da conversa"
+    },
+    {
+      "parameters": {
+        "jsCode": "const messages = $input.first().json.payload;\n\n// Filtra apenas mensagens incoming com conteúdo real do contato\nconst incomingMsgs = messages.filter(m =>\n  m.message_type === 0 &&\n  m.content &&\n  m.content.trim() !== '' &&\n  m.sender_type === 'Contact'\n);\n\nif (incomingMsgs.length === 0) {\n  return [{ json: { skip: true } }];\n}\n\n// Pega a mais recente\nconst last = incomingMsgs.sort((a, b) => b.created_at - a.created_at)[0];\n\nconst original = $('Webhook').first().json;\n\n// Monta um payload idêntico ao que o webhook receberia\nreturn [{\n  json: {\n    body: {\n      ...original.body,\n      message_type: 'incoming',\n      content: last.content,\n      conversation: {\n        ...original.body.conversation,\n        messages: [{\n          ...last,\n          processed_message_content: last.content\n        }]\n      }\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2272,
+        2192
+      ],
+      "id": "34c7cc45-71b6-44ad-9fde-3b14345601d8",
+      "name": "Extrai última mensagem real"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "rescue-skip-check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notTrue",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2048,
+        2192
+      ],
+      "id": "c00952c2-7d37-4609-9bd5-93e6d3a4f20c",
+      "name": "Tem mensagem válida?"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-darkay-u65509.vm.elestio.app",
+            "x-real-ip": "152.53.201.129",
+            "x-forwarded-for": "152.53.201.129",
+            "x-forwarded-proto": "https",
+            "x-forwarded-port": "443",
+            "connection": "close",
+            "content-length": "2389",
+            "accept": "application/json",
+            "user-agent": "rest-client/2.1.0 (linux-musl x86_64) ruby/3.3.3p89",
+            "content-type": "application/json",
+            "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "account": {
+              "id": 1,
+              "name": "chatwoot"
+            },
+            "additional_attributes": {},
+            "content_attributes": {},
+            "content_type": "text",
+            "content": "Ok",
+            "conversation": {
+              "additional_attributes": {},
+              "can_reply": true,
+              "channel": "Channel::Whatsapp",
+              "contact_inbox": {
+                "id": 457,
+                "contact_id": 459,
+                "inbox_id": 2,
+                "source_id": "554198173682",
+                "created_at": "2026-03-08T18:05:20.999Z",
+                "updated_at": "2026-03-08T18:05:20.999Z",
+                "hmac_verified": false,
+                "pubsub_token": "dLyfcAdspLmvR3EAS1E1PBtM"
+              },
+              "id": 781,
+              "inbox_id": 2,
+              "messages": [
+                {
+                  "id": 3853,
+                  "content": "Ok",
+                  "account_id": 1,
+                  "inbox_id": 2,
+                  "conversation_id": 781,
+                  "message_type": 0,
+                  "created_at": 1773698508,
+                  "updated_at": "2026-03-16T22:01:48.173Z",
+                  "private": false,
+                  "status": "sent",
+                  "source_id": "wamid.HBgMNTU0MTk4MTczNjgyFQIAEhggQUMyMUU5MEE2RkZBRkFBNjk5RTIwQTNGREQ0NzdDNTEA",
+                  "content_type": "text",
+                  "content_attributes": {},
+                  "sender_type": "Contact",
+                  "sender_id": 459,
+                  "external_source_ids": {},
+                  "additional_attributes": {},
+                  "processed_message_content": "Ok",
+                  "sentiment": {},
+                  "conversation": {
+                    "assignee_id": null,
+                    "unread_count": 10,
+                    "last_activity_at": 1773698508,
+                    "contact_inbox": {
+                      "source_id": "554198173682"
+                    }
+                  },
+                  "sender": {
+                    "additional_attributes": {},
+                    "custom_attributes": {},
+                    "email": null,
+                    "id": 459,
+                    "identifier": null,
+                    "name": "Alenir Maria Mioto",
+                    "phone_number": "+554198173682",
+                    "thumbnail": "",
+                    "blocked": false,
+                    "type": "contact"
+                  }
+                }
+              ],
+              "labels": [],
+              "meta": {
+                "sender": {
+                  "additional_attributes": {},
+                  "custom_attributes": {},
+                  "email": null,
+                  "id": 459,
+                  "identifier": null,
+                  "name": "Alenir Maria Mioto",
+                  "phone_number": "+554198173682",
+                  "thumbnail": "",
+                  "blocked": false,
+                  "type": "contact"
+                },
+                "assignee": null,
+                "team": null,
+                "hmac_verified": false
+              },
+              "status": "open",
+              "custom_attributes": {},
+              "snoozed_until": null,
+              "unread_count": 10,
+              "first_reply_created_at": "2026-03-08T18:05:33.529Z",
+              "priority": null,
+              "waiting_since": 0,
+              "agent_last_seen_at": 1773081808,
+              "contact_last_seen_at": 0,
+              "last_activity_at": 1773698508,
+              "timestamp": 1773698508,
+              "created_at": 1772993121,
+              "updated_at": 1773698508.174428
+            },
+            "created_at": "2026-03-16T22:01:48.173Z",
+            "id": 3853,
+            "inbox": {
+              "id": 2,
+              "name": "Agaxtur Jd Europa"
+            },
+            "message_type": "incoming",
+            "private": false,
+            "sender": {
+              "account": {
+                "id": 1,
+                "name": "chatwoot"
+              },
+              "additional_attributes": {},
+              "avatar": "",
+              "custom_attributes": {},
+              "email": null,
+              "id": 459,
+              "identifier": null,
+              "name": "Alenir Maria Mioto",
+              "phone_number": "+554198173682",
+              "thumbnail": "",
+              "blocked": false
+            },
+            "source_id": "wamid.HBgMNTU0MTk4MTczNjgyFQIAEhggQUMyMUU5MEE2RkZBRkFBNjk5RTIwQTNGREQ0NzdDNTEA",
+            "event": "message_created"
+          },
+          "webhookUrl": "https://n8n-darkay-u65509.vm.elestio.app/webhook/55896c1c-82bc-4fcb-b8b3-84d79f39292f",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agaxtur Bot",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "audioTranscrito": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "messageText": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unificaMessage": {
+      "main": [
+        [
+          {
+            "node": "Buffering",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "messageGemini": {
+      "main": [
+        [
+          {
+            "node": "unificaMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze video": {
+      "main": [
+        [
+          {
+            "node": "messageGemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio1": {
+      "main": [
+        [
+          {
+            "node": "audioTranscrito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buffering": {
+      "main": [
+        [
+          {
+            "node": "busca campanhas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agaxtur Bot",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agaxtur Bot": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca campanhas": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Confirmação de leitura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "variaveis": {
+      "main": [
+        [
+          {
+            "node": "verificaTipoMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verificaTipoMensagem": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "messageText",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "chatwootTexto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatwootTexto1": {
+      "main": [
+        [
+          {
+            "node": "salvar follow up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatwootAudio1": {
+      "main": [
+        [
+          {
+            "node": "salvar follow up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "variaveis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca mensagens da conversa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmação de leitura": {
+      "main": [
+        [
+          {
+            "node": "Agaxtur Bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Tool agaxtur'": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agaxtur Bot",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca mensagens da conversa": {
+      "main": [
+        [
+          {
+            "node": "Extrai última mensagem real",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai última mensagem real": {
+      "main": [
+        [
+          {
+            "node": "Tem mensagem válida?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tem mensagem válida?": {
+      "main": [
+        [
+          {
+            "node": "variaveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f597eca4-9c0a-42cc-a474-8990542e11c3",
+  "meta": {
+    "instanceId": "e14abecbeb88523dd432acda4b2bcec7caa30ea68d42bdb0b49a0bdd98b9ce8f"
+  },
+  "id": "IF6urvpHccDFFATO",
+  "tags": []
+}

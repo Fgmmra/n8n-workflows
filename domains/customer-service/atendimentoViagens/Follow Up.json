@@ -1,0 +1,568 @@
+{
+  "name": "Follow Up Agaxtur",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        16
+      ],
+      "id": "9b44ffd2-e094-4b4a-ab9a-f4778589a38d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "c2uC3VRnvOEUFjrN",
+          "mode": "list",
+          "cachedResultName": "data trigger agaxtur",
+          "cachedResultUrl": "/projects/5OunNy8IMpNCEwsl/datatables/c2uC3VRnvOEUFjrN"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        16
+      ],
+      "id": "b94d65b1-2e9c-4456-8b7b-9bcb46925ed1",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "90bdb296-f47c-4848-9f19-0432bcfdb2db",
+              "leftValue": "={{ $json.horario }}",
+              "rightValue": "={{ \n  $now\n    .setZone('America/Sao_Paulo')\n    .toFormat(\"yyyy-MM-dd HH:mm\")\n}}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        16
+      ],
+      "id": "d97da087-a6a9-43ae-ba4a-bdacea6063cf",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "c2uC3VRnvOEUFjrN",
+          "mode": "list",
+          "cachedResultName": "data trigger agaxtur",
+          "cachedResultUrl": "/projects/5OunNy8IMpNCEwsl/datatables/c2uC3VRnvOEUFjrN"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "numero",
+              "keyValue": "={{ $json.numero }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1456,
+        0
+      ],
+      "id": "064bd888-f9c4-421b-9e4a-f7931ff9809b",
+      "name": "apaga da planilha"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6c787a2c-3dff-4eb1-bcbc-3617ab543ce0",
+              "name": "numero",
+              "value": "={{ $('Get row(s)').item.json.numero }}",
+              "type": "string"
+            },
+            {
+              "id": "5930abf9-9bfd-4c4d-93a6-6ddfc79c8ef8",
+              "name": "id_chat",
+              "value": "={{ $('Get row(s)').item.json.id_chat }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        0
+      ],
+      "id": "84c56d22-bfe0-44ab-906b-279d33eabb4d",
+      "name": "numero"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('vars').item.json.context }}",
+        "options": {
+          "systemMessage": "=### **PERSONA**\n\nVocê é um especialista em reativação de clientes e etiqueta comercial.\nSua função é analisar o histórico da conversa e escrever uma mensagem de acompanhamento (follow-up) curta, natural e profissional, agindo como o remetente original que ficou sem resposta.\n\n---\n\n### **OBJETIVO PRINCIPAL**\n\nGerar uma mensagem genérica, segura e profissional que:\n\n* Nunca invente informações.\n* Nunca mencione dados que não estejam claramente presentes no histórico.\n* Nunca presuma destino, datas, valores ou agendamentos se não estiverem explícitos.\n* Seja adequada mesmo se a última mensagem do cliente for irrelevante, emocional ou fora de contexto.\n\n---\n\n### **DIRETRIZES DE ESCRITA**\n\n* **Tom de Voz:** Amigável, profissional e leve. Nunca use tom de cobrança.\n* **Concisão:** Máximo de 3 frases.\n* **Personalização Condicional:**\n\n  * Só mencione destino, orçamento, dúvida ou detalhe específico se isso estiver claramente explícito na última interação válida sobre a viagem.\n  * Se não houver contexto claro sobre a viagem, envie uma mensagem genérica de retomada.\n* **Call to Action (CTA):** Termine sempre com uma pergunta simples.\n\n---\n\n### **LÓGICA DE DECISÃO**\n\n1. Analise se a última interação contém contexto real sobre viagem.\n2. Se SIM → personalize mencionando apenas informações explicitamente citadas.\n3. Se NÃO → envie uma mensagem neutra e genérica de retomada de contato.\n4. Nunca invente dados para “preencher” contexto.\n5. Se o histórico estiver confuso, priorize uma mensagem genérica.\n\n---\n\n### **FORMATO DE SAÍDA**\n\nEnvie apenas o texto da mensagem final.\nSem explicações.\nSem assinatura automática.\nSem incluir cargo ou identidade institucional, a menos que isso esteja explícito no histórico.\n\n---\n\n## ✅ Exemplo de Output Seguro (fallback genérico)\n\n> Olá! Passando para retomar nosso contato e saber se posso ajudar com sua viagem. Fico à disposição caso queira dar continuidade ou tirar alguma dúvida. Como prefere seguir?\n\n---\n\n## ✅ Exemplo com Personalização (quando houver contexto real)\n\n> Oi! Queria saber se conseguiu analisar o orçamento que enviei para Florianópolis. Posso esclarecer algum detalhe ou ajustar algo para você?\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1680,
+        0
+      ],
+      "id": "4aee96f2-4011-4411-9041-034245cc51ed",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        176
+      ],
+      "id": "f2998ee9-b3aa-483d-bcd0-d31aaa1c7008",
+      "name": "Google Gemini Chat Model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "=AgaxturV2:QSjkipmaTH5DFUUoRFLCY:{{ $json.numero }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "65c10699-1f60-4244-8783-090cb05c70dd",
+      "name": "Redis",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "redis": {
+          "id": "O5D3ptYK9ag8lTwq",
+          "name": "Redis Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bbaabd33-f7ea-4b2f-a6d8-c4a6f0fec4b6",
+              "name": "numero",
+              "value": "={{ $('numero').item.json.numero }}",
+              "type": "string"
+            },
+            {
+              "id": "7e5460a4-04a8-4357-aeca-7c98de98800d",
+              "name": "context",
+              "value": "={{\n$json.propertyName\n  .slice(0, 6)          // pega os 6 mais recentes (porque está invertido)\n  .reverse()            // coloca na ordem correta (antigo → novo)\n  .map(item => {\n    const parsed = JSON.parse(item)\n    const role = parsed.type === 'human' ? 'USER' : 'ASSISTANT'\n    const content = parsed.data.content.replace(/\\n+/g, '\\n').trim()\n    return `${role}:\\n${content}`\n  })\n  .join('\\n\\n---\\n\\n')\n}}",
+              "type": "string"
+            },
+            {
+              "id": "bb043748-5ab3-4588-9edc-6b0705fca5a8",
+              "name": "id_chat",
+              "value": "={{ $('numero').item.json.id_chat }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        0
+      ],
+      "id": "82d568ee-c08d-4833-b201-d805b3b93245",
+      "name": "vars"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2064,
+        0
+      ],
+      "id": "0bbe10b8-9dd5-47f8-9577-989d204daebb",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2480,
+        16
+      ],
+      "id": "3a4b6e5e-ce30-4eec-803d-dcc582c8eaf9",
+      "name": "Wait",
+      "webhookId": "530098e1-d6e6-46d7-a27d-7130f40ce14b"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5496c873-612b-42a8-8e37-5846e46b5ad2",
+              "leftValue": "={{    (() => {     const now = $now.setZone('America/Sao_Paulo');     return now.weekday >= 1 && now.weekday <= 5;   })() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        16
+      ],
+      "id": "f5219e00-7b2d-466a-9fc4-0bd2b34a31e0",
+      "name": "verificar se é fim de semana"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "c2uC3VRnvOEUFjrN",
+          "mode": "list",
+          "cachedResultName": "data trigger agaxtur",
+          "cachedResultUrl": "/projects/5OunNy8IMpNCEwsl/datatables/c2uC3VRnvOEUFjrN"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "numero",
+              "keyValue": "={{ $('Get row(s)').item.json.numero }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        192
+      ],
+      "id": "0257ac9d-7927-4e64-99ab-93572b4343aa",
+      "name": "apaga da planilha1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot-darkay-u65509.vm.elestio.app//api/v1/accounts/1/conversations/{{ $('numero').item.json.id_chat }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "=cgU3WBuv1VHtj8JEowW5UvFF"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2288,
+        16
+      ],
+      "id": "22bde18d-c2b1-475b-8f18-6b7d75e44ec6",
+      "name": "chatwootTexto1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-02-23T09:32:22.003-05:00",
+          "Readable date": "February 23rd 2026, 9:32:22 am",
+          "Readable time": "9:32:22 am",
+          "Day of week": "Monday",
+          "Year": "2026",
+          "Month": "February",
+          "Day of month": "23",
+          "Hour": "09",
+          "Minute": "32",
+          "Second": "22",
+          "Timezone": "America/New_York (UTC-05:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Filter": [
+      {
+        "json": {
+          "numero": "5511958751561",
+          "horario": "2026-02-23 11:32",
+          "id": 16,
+          "createdAt": "2026-02-13T13:38:17.109Z",
+          "updatedAt": "2026-02-23T14:31:32.239Z"
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "verificar se é fim de semana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "numero": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "apaga da planilha": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "vars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "vars": {
+      "main": [
+        [
+          {
+            "node": "apaga da planilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "chatwootTexto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verificar se é fim de semana": {
+      "main": [
+        [
+          {
+            "node": "numero",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "apaga da planilha1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatwootTexto1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "eb8c8f51-f37e-45a1-af14-32d1691a4889",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e14abecbeb88523dd432acda4b2bcec7caa30ea68d42bdb0b49a0bdd98b9ce8f"
+  },
+  "id": "U5Thzk2n8GomQHpqYPSYe",
+  "tags": []
+}
