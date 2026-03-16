@@ -1,0 +1,1532 @@
+{
+  "name": "Contratos Bmidia",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Limit1",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -3392,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6b8dcd0e-bd56-4924-8376-87f09a63e180",
+              "name": "URL Info Doc",
+              "value": "{{GOOGLE_SHEETS_CONTRATOS_URL}}",
+              "type": "string"
+            },
+            {
+              "id": "dbe2ebe1-cdc4-4abd-af3b-ab04b38976c3",
+              "name": "URL Info Usuarios",
+              "value": "{{GOOGLE_SHEETS_CONTRATOS_URL}}",
+              "type": "string"
+            },
+            {
+              "id": "7b462de8-8ece-48e2-97da-d996ed681c10",
+              "name": "token",
+              "value": "{{AUTENTIQUE_API_TOKEN}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Info Inicial (URL)1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4000,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json['URL Info Doc'] }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json['URL Info Doc'] }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "name": "Dados Doc1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -3792,
+        800
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_SHEETS_ID}}",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0522a61b-adf3-494c-8934-62cf8ca9acc3",
+              "leftValue": "={{ $json['Id Doc'].toString() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "4fffd491-4688-4ea6-9d34-0b9853f467a0",
+              "leftValue": "={{ $json['Nome Empresa'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "82905929-bc83-47c1-a70a-e399f06643a7",
+              "leftValue": "={{ $json.STATUS }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "619e400f-3e8f-4882-9a3f-f2081baac876",
+              "leftValue": "={{ $json['Tipo de Doc'] }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "name": "Filter Docs1",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -3600,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Info Inicial (URL)1').item.json['URL Info Usuarios'] }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Info Inicial (URL)1').item.json['URL Info Usuarios'] }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "name": "Dados Usuarios1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -3200,
+        800
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_SHEETS_ID}}",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8305d084-3a61-4f6d-bdeb-9a99636396d5",
+              "leftValue": "={{ $json.Nome }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b6ff48e1-838c-4c62-98c9-8caeafc7c7d8",
+              "leftValue": "={{ $('Limit1').item.json['Id Doc'] }}",
+              "rightValue": "={{ $json['ID Doc'] }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "f325801e-811c-45d0-af0e-fe291c46d278",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d631cb32-bbda-450e-9bd1-2e1c6e54f007",
+              "leftValue": "={{ $json['Id Usuario'].toString() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "name": "Filter Usuarios1",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -3040,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "name": "Aggregate All1",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2864,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $json.data;\n\nconst signers = inputData.map(item => {\n  return {\n    name: item.Nome,\n    email: item.Email,\n    action: \"SIGN\"\n  };\n});\n\nreturn [{ json: { signers } }];"
+      },
+      "name": "Map Info Usuarios1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2688,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5d42820-f529-4bfe-b0a7-f5bc1b5c57a5",
+              "name": "Nome do Documento",
+              "value": "={{ $('Limit1').item.json['Nome Empresa'] }}",
+              "type": "string"
+            },
+            {
+              "id": "2bb2efc4-7ec4-47f8-a9a6-d3fefd4f06b4",
+              "name": "Mensagem Quando Enviado",
+              "value": "={{ $('Limit1').item.json['Mensagem Quando Enviado'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8aef3a6a-0fa4-425a-a2c6-6fadd783f24d",
+              "name": "Assinatura em Ordem",
+              "value": "={{ $('Limit1').item.json['Assinatura em Ordem'] }}",
+              "type": "boolean"
+            },
+            {
+              "id": "778e0840-bb42-4871-bb3f-451621b5b12b",
+              "name": "Permitir Recusa Documento",
+              "value": "={{ $('Limit1').item.json['Permitir Recusa Documento'] }}",
+              "type": "boolean"
+            },
+            {
+              "id": "91196ce4-cccc-49d1-823a-86a7ad194204",
+              "name": "Ler Todo Documento",
+              "value": "={{ $('Limit1').item.json['Ler Todo Documento'] }}",
+              "type": "boolean"
+            },
+            {
+              "id": "336fd57f-a788-4b11-afdf-18409892e60e",
+              "name": "Vencimento Assinatura",
+              "value": "={{ $('Limit1').item.json['Vencimento Assinatura'] }}",
+              "type": "string"
+            },
+            {
+              "id": "48a1602d-a706-46dc-90f6-d324bb404bf9",
+              "name": "Enviar Para Assinatura",
+              "value": "={{ $('Limit1').item.json['Enviar Para Assinatura'] }}",
+              "type": "boolean"
+            },
+            {
+              "id": "bd46c0df-84be-45af-ae4a-a55bb4f95709",
+              "name": "Receber Notificação Quando Assinado",
+              "value": "={{ $('Limit1').item.json['Receber Notificação Quando Assinado'] }}",
+              "type": "boolean"
+            },
+            {
+              "id": "539836f2-0142-47f5-945c-804e8c494c76",
+              "name": "CPF do Cliente",
+              "value": "={{ $('Filter Usuarios1').item.json.CPF }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Map Info Doc1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2512,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Info Inicial (URL)1').item.json['URL Info Doc'] }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Info Inicial (URL)1').item.json['URL Info Doc'] }}",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Limit1').item.json.row_number }}",
+            "STATUS": "CONCLUÍDO"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Id Doc",
+              "displayName": "Id Doc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nome Doc",
+              "displayName": "Nome Doc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensagem Quando Enviado",
+              "displayName": "Mensagem Quando Enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assinatura em Ordem",
+              "displayName": "Assinatura em Ordem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Permitir Recusa Documento",
+              "displayName": "Permitir Recusa Documento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ler Todo Documento",
+              "displayName": "Ler Todo Documento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vencimento Assinatura",
+              "displayName": "Vencimento Assinatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Enviar Para Assinatura",
+              "displayName": "Enviar Para Assinatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Receber Notificação Quando Assinado",
+              "displayName": "Receber Notificação Quando Assinado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "STATUS",
+              "displayName": "STATUS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo de Doc",
+              "displayName": "Tipo de Doc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "UPDATE STATUS DOC1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -752,
+        896
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_SHEETS_ID}}",
+          "name": "Google Sheets OAuth2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Info Inicial (URL)1').item.json['URL Info Usuarios'] }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Info Inicial (URL)1').item.json['URL Info Usuarios'] }}",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "CONCLUIDO",
+            "row_number": "={{ $('Limit1').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Id Usuario",
+              "displayName": "Id Usuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ID Doc",
+              "displayName": "ID Doc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "UPDATE STATUS USUARIOS1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -304,
+        720
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_SHEETS_ID}}",
+          "name": "Google Sheets OAuth2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "32b47cce-a4c6-41fc-bfb3-57537252b544",
+              "name": "data",
+              "value": "={{ $('Aggregate All1').item.json.data }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -752,
+        720
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        720
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger2",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -4224,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "name": "Donwload Doc (PDF)4",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1248,
+        960
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DRIVE_ID}}",
+          "name": "Google Drive OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Dados Doc1').item.json['Tipo de Doc'] }}",
+                    "rightValue": "IMPLEMENTAÇÃO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d667dee9-e725-434e-9abd-d9efbb841325"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "implementação"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4b1b478a-a01d-4e96-9b5f-da33af1941aa",
+                    "leftValue": "={{ $('Dados Doc1').item.json['Tipo de Doc'] }}",
+                    "rightValue": "START",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5e0d226f-fd9f-406e-9bf8-f80bd7584835",
+                    "leftValue": "={{ $('Dados Doc1').item.json['Tipo de Doc'] }}",
+                    "rightValue": "ESSENCIAL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "essencial"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -2336,
+        784
+      ],
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a6a5bc5-e332-4913-b475-c141764d3aa2",
+              "name": "=contrato",
+              "value": "IMPLEMENTAÇÃO DE TRÁFEGO -",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2032,
+        640
+      ],
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a6a5bc5-e332-4913-b475-c141764d3aa2",
+              "name": "=contrato",
+              "value": "CONTRATO DE TRÁFEGO PAGO -",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2032,
+        800
+      ],
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a6a5bc5-e332-4913-b475-c141764d3aa2",
+              "name": "=contrato",
+              "value": "CONTRATO DE TRÁFEGO PAGO - ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2032,
+        960
+      ],
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "simple": false,
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{$nome.empresa}}",
+              "replaceText": "={{ $('Map Info Doc1').item.json['Nome do Documento'] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$cnpj}}",
+              "replaceText": "={{ $('Limit1').item.json.CNPJ }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$endereco.empresa}}",
+              "replaceText": "={{ $('Limit1').item.json['Endereço Empresa'] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$nome.representante}}",
+              "replaceText": "={{ $('Dados Usuarios1').item.json.Nome }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$cpf.representante}}",
+              "replaceText": "={{ $('Map Info Doc1').item.json['CPF do Cliente'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        960
+      ],
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DOCS_ID}}",
+          "name": "Google Docs OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "{{GOOGLE_DRIVE_TEMPLATE_TRAFEGO_ESSENCIAL_ID}}",
+          "mode": "id"
+        },
+        "name": "=Trafego pago essencial - {{ $('Dados Doc1').item.json['Nome Empresa'] }}.pdf",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "{{GOOGLE_DRIVE_FOLDER_CONTRATOS_ENVIADOS_ID}}",
+          "mode": "list",
+          "cachedResultName": "Contratos ENVIADOS",
+          "cachedResultUrl": "{{GOOGLE_DRIVE_FOLDER_CONTRATOS_ENVIADOS_URL}}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1792,
+        960
+      ],
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DRIVE_ID}}",
+          "name": "Google Drive OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.autentique.com.br/v2/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Info Inicial (URL)1').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "operations",
+              "value": "={\n  \"query\": \"mutation CreateDocumentMutation($document: DocumentInput!, $signers: [SignerInput!]!, $file: Upload!) { createDocument(document: $document, signers: $signers, file: $file) { id name refusable sortable created_at signatures { public_id name email created_at action { name } link { short_link } user { id name email } } } }\",\n  \"variables\": {\n    \"document\": {\n      \"name\": \"{{ $('Edit Fields3').item.json.contrato }}{{ $('Switch').item.json['Nome do Documento'] }}\",\n      \"message\": \"{{ $('Switch').item.json['Mensagem Quando Enviado'] }}\",\n      \"reminder\": \"DAILY\",\n      \"sortable\": {{ $('Map Info Doc1').item.json['Assinatura em Ordem'] }},\n      \"refusable\": {{ $('Map Info Doc1').item.json['Permitir Recusa Documento'] }},\n      \"footer\": \"LEFT\",\n      \"deadline_at\": \"{{ $('Limit1').item.json['Vencimento Assinatura'].isNotEmpty() == false ? '' : new Date($('Limit1').item.json['Vencimento Assinatura']).toISOString() }}\",\n      \"new_signature_style\": true,\n      \"ignore_cpf\": false,\n      \"configs\": {\n        \"notification_finished\": {{ $('Map Info Doc1').item.json['Enviar Para Assinatura'] }},\n        \"notification_signed\": {{ $('Map Info Doc1').item.json['Receber Notificação Quando Assinado'] }}\n      },\n      \"locale\": {\n        \"language\": \"pt-BR\",\n        \"country\": \"BR\",\n        \"timezone\": \"America/Sao_Paulo\",\n        \"date_format\": \"DD_MM_YYYY\"\n      }\n    },\n    \"signers\": {{ $('Map Info Usuarios1').item.json.signers.toJsonString() }}\n  }\n}\n"
+            },
+            {
+              "name": "map",
+              "value": "={\n  \"file\": [\"variables.file\"]\n}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Criar Doc (Autentique)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -976,
+        800
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Não ligar ate arrumar tudo",
+        "height": 672,
+        "width": 960
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1024,
+        512
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy file1').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "name": "Donwload Doc (PDF)",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1248,
+        800
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DRIVE_ID}}",
+          "name": "Google Drive OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "simple": false,
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{$nome.empresa}}",
+              "replaceText": "={{ $('Map Info Doc1').item.json['Nome do Documento'] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$cnpj}}",
+              "replaceText": "={{ $('Limit1').item.json.CNPJ }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$endereco.empresa}}",
+              "replaceText": "={{ $('Limit1').item.json['Endereço Empresa'] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$nome.representante}}",
+              "replaceText": "={{ $('Dados Usuarios1').item.json.Nome }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$cpf.representante}}",
+              "replaceText": "={{ $('Map Info Doc1').item.json['CPF do Cliente'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        800
+      ],
+      "name": "Update a document1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DOCS_ID}}",
+          "name": "Google Docs OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "{{GOOGLE_DRIVE_TEMPLATE_TRAFEGO_START_ID}}",
+          "mode": "list",
+          "cachedResultName": "CONTRATO DE TRÁFEGO PAGO PLANO START - Padrão",
+          "cachedResultUrl": "https://docs.google.com/document/d/{{GOOGLE_DRIVE_TEMPLATE_TRAFEGO_START_ID}}"
+        },
+        "name": "=Trafego pago essencial - {{ $('Dados Doc1').item.json['Nome Empresa'] }}.pdf",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "{{GOOGLE_DRIVE_FOLDER_CONTRATOS_ENVIADOS_ID}}",
+          "mode": "list",
+          "cachedResultName": "Contratos ENVIADOS",
+          "cachedResultUrl": "{{GOOGLE_DRIVE_FOLDER_CONTRATOS_ENVIADOS_URL}}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1792,
+        800
+      ],
+      "name": "Copy file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DRIVE_ID}}",
+          "name": "Google Drive OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy file2').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "name": "Donwload Doc (PDF)1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1248,
+        640
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DRIVE_ID}}",
+          "name": "Google Drive OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "simple": false,
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{$nome.empresa}}",
+              "replaceText": "={{ $('Map Info Doc1').item.json['Nome do Documento'] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$cnpj}}",
+              "replaceText": "={{ $('Limit1').item.json.CNPJ }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$endereco.empresa}}",
+              "replaceText": "={{ $('Limit1').item.json['Endereço Empresa'] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$nome.representante}}",
+              "replaceText": "={{ $('Dados Usuarios1').item.json.Nome }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{$cpf.representante}}",
+              "replaceText": "={{ $('Map Info Doc1').item.json['CPF do Cliente'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        640
+      ],
+      "name": "Update a document2",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DOCS_ID}}",
+          "name": "Google Docs OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "{{GOOGLE_DRIVE_TEMPLATE_IMPLEMENTACAO_ID}}",
+          "mode": "list",
+          "cachedResultName": "IMPLEMENTAÇÃO DE TRÁFEGO - Padrão ",
+          "cachedResultUrl": "https://docs.google.com/document/d/{{GOOGLE_DRIVE_TEMPLATE_IMPLEMENTACAO_ID}}"
+        },
+        "name": "=Implementação de Tráfego -  {{ $('Dados Doc1').item.json['Nome Empresa'] }}.pdf",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "{{GOOGLE_DRIVE_FOLDER_CONTRATOS_ENVIADOS_ID}}",
+          "mode": "list",
+          "cachedResultName": "Contratos ENVIADOS",
+          "cachedResultUrl": "{{GOOGLE_DRIVE_FOLDER_CONTRATOS_ENVIADOS_URL}}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1792,
+        640
+      ],
+      "name": "Copy file2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{CREDENTIAL_GOOGLE_DRIVE_ID}}",
+          "name": "Google Drive OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Dados Usuarios1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info Inicial (URL)1": {
+      "main": [
+        [
+          {
+            "node": "Dados Doc1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados Doc1": {
+      "main": [
+        [
+          {
+            "node": "Filter Docs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Docs1": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados Usuarios1": {
+      "main": [
+        [
+          {
+            "node": "Filter Usuarios1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Usuarios1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate All1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate All1": {
+      "main": [
+        [
+          {
+            "node": "Map Info Usuarios1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Info Usuarios1": {
+      "main": [
+        [
+          {
+            "node": "Map Info Doc1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Info Doc1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "UPDATE STATUS USUARIOS1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Info Inicial (URL)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Donwload Doc (PDF)4": {
+      "main": [
+        [
+          {
+            "node": "Criar Doc (Autentique)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Copy file2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Copy file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document": {
+      "main": [
+        [
+          {
+            "node": "Donwload Doc (PDF)4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Doc (Autentique)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "UPDATE STATUS DOC1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document1": {
+      "main": [
+        [
+          {
+            "node": "Donwload Doc (PDF)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file1": {
+      "main": [
+        [
+          {
+            "node": "Update a document1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Donwload Doc (PDF)": {
+      "main": [
+        [
+          {
+            "node": "Criar Doc (Autentique)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document2": {
+      "main": [
+        [
+          {
+            "node": "Donwload Doc (PDF)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file2": {
+      "main": [
+        [
+          {
+            "node": "Update a document2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Donwload Doc (PDF)1": {
+      "main": [
+        [
+          {
+            "node": "Criar Doc (Autentique)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    {
+      "updatedAt": "2025-11-17T18:42:48.870Z",
+      "createdAt": "2025-11-17T18:42:48.870Z",
+      "id": "F9wQ5zyYvvIdbgd0",
+      "name": "BMIDIA"
+    }
+  ]
+}
