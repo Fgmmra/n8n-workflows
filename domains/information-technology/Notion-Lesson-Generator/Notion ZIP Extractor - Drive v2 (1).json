@@ -1,0 +1,890 @@
+{
+  "name": "Notion ZIP Extractor - Drive v2",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1xi9yAjSjBNHo07ZHprO0NVhHYRt2gQV_",
+          "mode": "list",
+          "cachedResultName": "POC - prima do Nicolas",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1xi9yAjSjBNHo07ZHprO0NVhHYRt2gQV_"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1f2bee00-e44b-4d69-9c6d-f5449d20db33",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fWC7j0KbxhTu711N",
+          "name": "Drive Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b68ce9bf-04b6-41c9-9cc4-ecbcb98e8dbb",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fWC7j0KbxhTu711N",
+          "name": "Drive Darkay"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "outputPrefix": "data"
+      },
+      "id": "11dc4fcd-6628-43b7-8347-95d1f34dde7e",
+      "name": "Decompress Nível 1",
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1,
+      "position": [
+        432,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items_out = [];\n\nfor (const item of items) {\n  const binaryKeys = Object.keys(item.binary || {});\n\n  for (const key of binaryKeys) {\n    const bin = item.binary[key];\n    const filename = bin.fileName || key;\n    const extension = filename.split('.').pop().toLowerCase();\n    const isZip = extension === 'zip';\n\n    items_out.push({\n      json: { filename, extension, isZip },\n      binary: { data: bin }  // sempre preserva o binário\n    });\n  }\n}\n\nreturn items_out;"
+      },
+      "id": "646c4fe5-6ca3-40b3-bf88-1bff95b26f3e",
+      "name": "Binário → Texto (Nível 1)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-iszip",
+              "leftValue": "={{ $json.isZip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "28420e73-11d2-4d3a-98ea-a03dddbc29ff",
+      "name": "É ZIP interno?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "outputPrefix": "data"
+      },
+      "id": "d2fcf1ac-bda5-4b8a-ae03-757c5696cccc",
+      "name": "Decompress Nível 2",
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        -144
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "25961d76-e863-4e1d-9d14-23a0b78470a1",
+      "name": "Merge Arquivos",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1568,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mimeType }}",
+                    "rightValue": "^text/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    },
+                    "id": "e01f156e-2096-4538-b122-d1a0b9ef92fb"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mimeType }}",
+                    "rightValue": "^image/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    },
+                    "id": "8880f545-5a79-4804-8d24-6f1945cda7f9"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mimeType }}",
+                    "rightValue": "^audio/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    },
+                    "id": "b0c3640d-ed08-4394-aefc-ee5ef698fa3e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "44bb12e3-66f5-4e99-9810-0899322c7bf5",
+      "name": "Switch por Tipo",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1984,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "$binary",
+        "include": "allOtherFields",
+        "options": {
+          "includeBinary": true
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        -144
+      ],
+      "id": "c18bee63-44a0-408f-86a8-b7c221bd0d21",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "// DEBUG: retorna info de todos os binários sem converter\nconst debug = [];\n\nfor (const item of items) {\n  const binaryKeys = Object.keys(item.binary || {});\n  for (const key of binaryKeys) {\n    const bin = item.binary[key];\n    debug.push({\n      json: {\n        key,\n        fileName: bin.fileName,\n        fileExtension: bin.fileExtension,\n        mimeType: bin.mimeType,\n        dataType: typeof bin.data,\n        dataLength: bin.data?.length,\n        dataPreview: bin.data?.substring(0, 80)\n      }\n    });\n  }\n}\n\nreturn debug;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ],
+      "id": "2ff4846b-6d31-4e59-b16c-c09ad3f5f7cb",
+      "name": "Filtrar e Converter Binários"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "={{ $('Merge Arquivos').item.binary[$json.key] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        -464
+      ],
+      "id": "7dea84cd-e067-4b9c-b8ed-7cecaa646cec",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<prompt_transcricao_audio>\n    <instrucao_principal>\n        <descricao>\n            Transcreva o audio na exata lingua que ele está, não altere o idioma de forma alguma.\n        </descricao>\n    </instrucao_principal>\n\n    <regras_transcricao>\n        <regra_idioma>\n            <titulo>Preservação do idioma original</titulo>\n            <detalhes>\n                O áudio deve ser transcrito mantendo exatamente o idioma em que foi gravado, sem qualquer tipo de tradução ou alteração linguística.\n            </detalhes>\n        </regra_idioma>\n\n        <regra_fidelidade>\n            <titulo>Fidelidade ao conteúdo</titulo>\n            <detalhes>\n                A transcrição deve ser uma reprodução fiel do que foi falado, preservando palavras, expressões e estruturas gramaticais originais.\n            </detalhes>\n        </regra_fidelidade>\n\n        <regra_integridade>\n            <titulo>Não alteração</titulo>\n            <detalhes>\n                Não realizar correções, adaptações ou modificações no texto transcrito, mantendo a forma original da fala.\n            </detalhes>\n        </regra_integridade>\n    </regras_transcricao>\n\n    <processo_execucao>\n        <etapa_1>Escutar o áudio completo</etapa_1>\n        <etapa_2>Identificar o idioma falado</etapa_2>\n        <etapa_3>Transcrever palavra por palavra no idioma original</etapa_3>\n        <etapa_4>Revisar a transcrição para garantir fidelidade</etapa_4>\n    </processo_execucao>\n\n    <observacoes>\n        <nota>\n            Caso o áudio contenha múltiplos idiomas, cada segmento deve ser transcrito no idioma correspondente em que foi falado.\n        </nota>\n    </observacoes>\n</prompt_transcricao_audio>",
+        "inputType": "binary",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        -144
+      ],
+      "id": "e44d4293-4736-448d-926d-aad3956f55c5",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?> <prompt_analise_conteudo>     <introducao>         <descricao>             O conteúdo que você vai receber pode ser três tipos de coisas diferentes: uma imagem, um video ou um documento, independente da extensão do arquivo.         </descricao>     </introducao>      <classificacao>         <regra>             Para cada caso você deve identificar em qual caso o item se encaixa da melhor maneira e responder conforme as ordens para cada respectivo tipo de classificação.         </regra>     </classificacao>      <tipos_conteudo>         <imagem>             <acao>                 Leia, entenda o que se passa na imagem e descreva brevemente o conteúdo dela.             </acao>         </imagem>          <video>             <acao>                 Observe e entenda o contexto dele, feito isso, explique sobre o que o video fala brevemente.             </acao>         </video>          <documento>             <acao>                 Leia todo o conteúdo e fale sobre o que se trata em detalhes.             </acao>         </documento>     </tipos_conteudo>      <ordens_obrigatorias>         <titulo>Ordens que devem ser seguidas a todo custo:</titulo>         <regra_1>Não use caracteres especiais</regra_1>         <regra_2>Não use jargões ou gírias</regra_2>         <regra_3>Seja detalhista</regra_3>         <regra_4>Seja breve e direto</regra_4>     </ordens_obrigatorias>      <formatacao_resposta>         <instrucao>             No inicio da sua mensagem, coloque exatamente: MENSAGEM DE ANALISE         </instrucao>     </formatacao_resposta> </prompt_analise_conteudo>",
+        "inputType": "binary",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        -304
+      ],
+      "id": "36fe5201-8604-4548-96ac-f07e4ca117fd",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02d75848-f087-454b-bb92-37386cf35eae",
+              "name": "data",
+              "value": "={{ $('Merge Arquivos').item.binary[$json.key] }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2320,
+        -144
+      ],
+      "id": "2d3bf770-b4c6-4e2a-b8a4-e1981314a5d9",
+      "name": "Captura Binário Audio"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02d75848-f087-454b-bb92-37386cf35eae",
+              "name": "data",
+              "value": "={{ $('Merge Arquivos').item.binary[$json.key] }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2320,
+        -304
+      ],
+      "id": "31e6bbc7-c3ab-4f65-9598-5598c7c7a6ac",
+      "name": "Captura Binário image"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2816,
+        -320
+      ],
+      "id": "c41c41a8-c98e-4151-a77d-244eb79ef4eb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "data, content.parts[0].text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3008,
+        -304
+      ],
+      "id": "49c68f19-2aa9-46c7-a4e7-34c7f05b77a0",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=---\n\n## INPUT DOCUMENTS\n\nThe following content was extracted from the student's Notion export. Use it as your primary reference for all sections above.\n\n{{ $json.data[0].data }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "=You are an expert English language teaching assistant. Your job is to analyze transcription documents from a Notion export and generate personalized lesson materials for each student identified in the documents.  ---  ## STEP 1 — IDENTIFY STUDENTS  Read all provided documents carefully. Identify each distinct student by name. Group all documents that belong to the same student together. Each student will receive their own independent lesson material.  ---  ## STEP 2 — EXTRACT STUDENT PROFILE  For each student, extract: - **Name**: The student's full name as it appears in the documents - **Level**: Infer from vocabulary used, complexity of sentences, and content discussed (Beginner / Pre-Intermediate / Intermediate / Upper-Intermediate / Advanced) - **Grammar Topic**: Identify the most relevant grammar point to teach based on patterns, gaps, or themes found in the student's documents (e.g. past perfect, conditionals, passive voice, modal verbs)  ---  ## STEP 3 — GENERATE LESSON MATERIAL  For each student, produce a complete lesson following the structure below. All content must be written in English. The tone should be sophisticated, engaging, and deeply personal to the student's context.  Use the reference materials provided as the primary source for vocabulary, quotes, themes, and narrative content. Do not invent context that is not grounded in the documents.  ---  ### OUTPUT FORMAT (one per student):  ---  📘 Lesson: [Creative Title — derived from the student's context and grammar topic] Student: [Name] \n Level: [Level] \n Topic: [Grammar Topic]  ---  🎧 1. Transcription (The Narrative Hook) Write a short audio-script style paragraph (3–5 sentences) that introduces the grammar topic through the lens of the student's personal or professional universe. Draw directly from themes, vocabulary, or situations found in the reference documents. The tone should feel cinematic and immersive.  ---  🔥 2. Warm Up (Personal Connection) Write 3 deep, open-ended questions that connect the student's background (as reflected in the documents) to the grammar topic. Questions should provoke genuine reflection and encourage extended speaking. Avoid surface-level questions.  ---  🎯 3. Vocabulary & Matching Exercise Select 5–7 advanced vocabulary words extracted directly from the reference documents. For each word, write: - The word in bold - A concise, student-friendly definition - A usage example rooted in the student's context  Format as a table: \n Word \n Definition \n Example \n  ---  💬 4. Quote & Reflection (The Deep Dive) Select one meaningful quote from the reference documents (or a well-known author/figure relevant to the student's field). Present the quote, then write one reflection prompt that asks the student to: 1. Analyze the quote using at least one vocabulary word from Section 3 2. Connect it to the grammar topic of the lesson  ---  🧠 5. Story Chain Exercise Design a collaborative storytelling or problem-solving activity where the student and teacher build a narrative together. The scenario must: - Be rooted in the student's professional or personal universe - Require active use of the lesson's grammar topic - Incorporate at least 3 vocabulary words from Section 3 - Have a clear starting prompt and guiding questions to keep the chain moving  ---  ## RULES  - Generate one complete lesson per student identified — never merge students - All sections must be grounded in the provided documents — no generic content - If a section cannot be fully built due to insufficient context, adapt it creatively but flag it with a note: ⚠️ *Limited context available for this section* - Maintain consistent tone: sophisticated, warm, intellectually stimulating - Grammar topic must emerge naturally from the content — never feel forced - Vocabulary must come from the actual documents whenever possible"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        3216,
+        -304
+      ],
+      "id": "5c72176c-52d5-4814-9b20-7fdb216ce645",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY86qiyThjYJvuGJ",
+          "name": "Darkay Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bfdbb658-8174-460b-8c68-4479f549f7cd",
+              "name": "output",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3568,
+        -304
+      ],
+      "id": "700a497e-4691-4119-bd11-ff36bc3491ca",
+      "name": "Captura Output"
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $json.output }}",
+        "name": "=Material de Aula - {{ $now }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1CqUFfcKUn2EoCH7AgJFpBkewiwCLNIy-",
+          "mode": "list",
+          "cachedResultName": "Material de Aula",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1CqUFfcKUn2EoCH7AgJFpBkewiwCLNIy-"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3808,
+        -304
+      ],
+      "id": "df32a421-3cdf-4a8d-993b-b37bec1e92eb",
+      "name": "Create file from text",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fWC7j0KbxhTu711N",
+          "name": "Drive Darkay"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Google Drive Trigger": [
+      {
+        "json": {
+          "parents": [
+            "1xi9yAjSjBNHo07ZHprO0NVhHYRt2gQV_"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Global Automation",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "08891605598407828687",
+            "emailAddress": "atendimento@globalautomation7.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLImNj0a15wcuqkiHwmlHk5cCaGN3gJJEWxg64JlG0dnEWjEQ=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Global Automation",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "08891605598407828687",
+              "emailAddress": "atendimento@globalautomation7.com",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLImNj0a15wcuqkiHwmlHk5cCaGN3gJJEWxg64JlG0dnEWjEQ=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "08891605598407828687",
+              "type": "user",
+              "emailAddress": "atendimento@globalautomation7.com",
+              "role": "owner",
+              "displayName": "Global Automation",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLImNj0a15wcuqkiHwmlHk5cCaGN3gJJEWxg64JlG0dnEWjEQ=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "08891605598407828687"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1fNonYZriOVfBzUmsArRh-Yl8jrHtblq_",
+          "name": "f21bf62d-b93a-446e-b60f-d34071a2678a_ExportBlock-5e5d91fa-bccb-4a38-994a-aed77a9fba10.zip",
+          "mimeType": "application/x-zip-compressed",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "2",
+          "webContentLink": "https://drive.google.com/uc?id=1fNonYZriOVfBzUmsArRh-Yl8jrHtblq_&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1fNonYZriOVfBzUmsArRh-Yl8jrHtblq_/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/x-zip-compressed",
+          "hasThumbnail": false,
+          "thumbnailVersion": "0",
+          "viewedByMe": true,
+          "viewedByMeTime": "2026-03-17T19:32:33.780Z",
+          "createdTime": "2026-03-17T19:32:33.780Z",
+          "modifiedTime": "2026-03-17T19:32:06.000Z",
+          "modifiedByMeTime": "2026-03-17T19:32:06.000Z",
+          "modifiedByMe": true,
+          "shared": false,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "f21bf62d-b93a-446e-b60f-d34071a2678a_ExportBlock-5e5d91fa-bccb-4a38-994a-aed77a9fba10.zip",
+          "fullFileExtension": "zip",
+          "fileExtension": "zip",
+          "md5Checksum": "547d3cd271ca657a73ea4cb636564ede",
+          "sha1Checksum": "3ce3a16816c43005057c588047c05f0f264386b6",
+          "sha256Checksum": "a09c71adc1fd919972aac9d088a6339f1266f59f321741833cfdf5731f733520",
+          "size": "1711734",
+          "quotaBytesUsed": "1711734",
+          "headRevisionId": "0B397py58lz_eRTB2WkFoTUQwaFc1eWtyanphSzAvVFpaaTZRPQ",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Decompress Nível 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decompress Nível 1": {
+      "main": [
+        [
+          {
+            "node": "Binário → Texto (Nível 1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Binário → Texto (Nível 1)": {
+      "main": [
+        [
+          {
+            "node": "É ZIP interno?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "É ZIP interno?": {
+      "main": [
+        [
+          {
+            "node": "Decompress Nível 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Arquivos",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Decompress Nível 2": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Arquivos": {
+      "main": [
+        [
+          {
+            "node": "Filtrar e Converter Binários",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge Arquivos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar e Converter Binários": {
+      "main": [
+        [
+          {
+            "node": "Switch por Tipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch por Tipo": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Captura Binário image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Captura Binário Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Captura Binário Audio": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Captura Binário image": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Captura Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Captura Output": {
+      "main": [
+        [
+          {
+            "node": "Create file from text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fae5d6f2-9d11-4176-931a-926815171ae1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e14abecbeb88523dd432acda4b2bcec7caa30ea68d42bdb0b49a0bdd98b9ce8f"
+  },
+  "id": "fqaLfyNJOPkkfYu8",
+  "tags": []
+}
